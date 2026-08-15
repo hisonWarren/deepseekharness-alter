@@ -7,7 +7,7 @@
 
 - 稳定启动（端口回收、单实例、直连默认）
 - 托盘控制：应用内/外桌宠显示与尺寸
-- UX 抛光插件：`plugins-local/dsh-ux-polish`（静音杂讯行 + 安全「编辑」填回）
+- UX 抛光插件：`plugins-local/dsh-ux-polish`（静音杂讯行 + 用户消息**内联编辑**并分支）
 - Windows 任务栏 DeepSeek 图标
 
 仓库：https://github.com/hisonWarren/deepseekharness-alter
@@ -40,15 +40,24 @@ npm start
 - **应用外桌宠**：隐藏/显示；大小档位
 - **网络**：强制直连（推荐）/ 自动 / 强制代理
 
+### 会话列表：归档 ≠ 删除
+
+上游 DeepSeek Harness **没有**持久「删除对话」接口，侧边栏只有 **归档会话**：
+
+- **归档**：从列表隐藏，会话日志仍保留在本机
+- **删除**：官方未提供；本 alter **不会**把归档伪装成删除
+
+若需永久清理，只能自行管理 `~/.dsh` 数据（有风险），或等待上游提供删除 API。
+
 ## 发版（与 Lumina 相同：打 tag 触发 CI）
 
-1. 更新 `package.json` 的 `version`（如 `0.1.1`）
+1. 更新 `package.json` 的 `version`（如 `0.2.0`）
 2. 提交并推送到 `main`
 3. 打 tag 并推送：
 
 ```bash
-git tag v0.1.1
-git push origin v0.1.1
+git tag v0.2.0
+git push origin v0.2.0
 ```
 
 GitHub Actions [Release](.github/workflows/release.yml) 会构建 Win / macOS / Linux 并上传到 Releases。
