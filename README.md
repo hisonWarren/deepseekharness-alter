@@ -49,20 +49,23 @@ npm start
 
 若需永久清理，只能自行管理 `~/.dsh` 数据（有风险），或等待上游提供删除 API。
 
-## 发版（与 Lumina 相同：打 tag 触发 CI）
+## 发版
 
-1. 更新 `package.json` 的 `version`（如 `0.2.1`）
+推送形如 `v*` 的 tag 后，GitHub Actions 会自动打包并发布：
+
+1. 把 `package.json` 里的 `version` 改成新版本号（例如 `0.2.3`）
 2. 提交并推送到 `main`
-3. 打 tag 并推送：
+3. 打同名 tag 并推送（版本号前加 `v`）：
 
 ```bash
-git tag v0.2.2
-git push origin v0.2.2
+git tag v0.2.3
+git push origin v0.2.3
 ```
 
-GitHub Actions [Release](.github/workflows/release.yml) 会构建 Win / macOS / Linux 并上传到 Releases。
+工作流：[Release](.github/workflows/release.yml)  
+产物会出现在 [Releases](https://github.com/hisonWarren/deepseekharness-alter/releases)：Windows `.exe`、macOS `.dmg`、Linux `.AppImage`。
 
-本地仅打 Windows 包：
+只想在本机打 Windows 安装包：
 
 ```bash
 npm run dist:win
@@ -72,7 +75,7 @@ npm run dist:win
 
 - 本仓库是 **桌面壳 + 本地插件** 的 alter；完整社区插件集仍可通过官方 dsh 配置文件安装。
 - 打包产物内含 `dsh-runtime`（`@deepseek-ai/dsh`）。体积较大属预期。
-- macOS / Windows 默认 **未签名**（与未配置证书时的 Lumina CI 行为类似）。
+- macOS / Windows 安装包默认 **未做代码签名**（未配置证书时）。
 
 ## License
 
