@@ -21,7 +21,7 @@ jobs:
       version: ${{ steps.meta.outputs.version }}
       tag: ${{ steps.meta.outputs.tag }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - id: meta
         run: |
           if [ -n "${{ github.event.inputs.version }}" ]; then
@@ -53,7 +53,7 @@ jobs:
             artifact: dsh-alter-win
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Validate package.json version matches tag
         shell: bash
@@ -64,7 +64,7 @@ jobs:
             exit 1
           fi
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: "22"
           cache: npm
@@ -99,7 +99,7 @@ jobs:
         if: matrix.platform == 'linux'
         run: npx electron-builder --linux --x64 --publish never
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: ${{ matrix.artifact }}
           path: |
@@ -116,7 +116,7 @@ jobs:
     needs: [resolve-version, build]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           path: artifacts
           merge-multiple: true
