@@ -7,14 +7,12 @@
 
 - 稳定启动（端口回收、单实例、直连默认）
 - 托盘控制：应用内/外桌宠显示与尺寸
-- UX 抛光插件：`plugins-local/dsh-ux-polish`（静音杂讯行 + 用户消息**内联编辑**并分支）
+- UX 抛光：静音杂讯行 + 用户消息内联编辑并分支
 - Windows 任务栏 DeepSeek 图标
-
-仓库：https://github.com/hisonWarren/deepseekharness-alter
 
 ## 下载
 
-从 [Releases](https://github.com/hisonWarren/deepseekharness-alter/releases) 下载：
+从 [Releases](https://github.com/hisonWarren/deepseekharness-alter/releases) 下载对应平台安装包：
 
 | 平台 | 产物 |
 |------|------|
@@ -24,58 +22,17 @@
 
 首次使用前请配置 DeepSeek API Key（与官方 dsh 相同，写入 `~/.dsh/.credentials.yaml`）。
 
-## 本地开发
-
-```bash
-npm install
-npm run prepare:dsh   # 安装便携 dsh 运行时到 ./dsh-runtime
-npm start
-```
-
-若本机已有 `../deepseek-harness` 官方安装，也可直接复用该目录作为运行时。
-
-### 托盘菜单
+## 托盘菜单
 
 - **应用内宠物**：隐藏/显示；尺寸 160/200/260/320
 - **应用外桌宠**：隐藏/显示；大小档位
 - **网络**：强制直连（推荐）/ 自动 / 强制代理
 
-### 会话列表：归档 ≠ 删除
-
-上游 DeepSeek Harness **没有**持久「删除对话」接口，侧边栏只有 **归档会话**：
-
-- **归档**：从列表隐藏，会话日志仍保留在本机
-- **删除**：官方未提供；本 alter **不会**把归档伪装成删除
-
-若需永久清理，只能自行管理 `~/.dsh` 数据（有风险），或等待上游提供删除 API。
-
-## 发版
-
-推送形如 `v*` 的 tag 后，GitHub Actions 会自动打包并发布：
-
-1. 把 `package.json` 里的 `version` 改成新版本号（例如 `0.2.3`）
-2. 提交并推送到 `main`
-3. 打同名 tag 并推送（版本号前加 `v`）：
-
-```bash
-git tag v0.2.3
-git push origin v0.2.3
-```
-
-工作流：[Release](.github/workflows/release.yml)  
-产物会出现在 [Releases](https://github.com/hisonWarren/deepseekharness-alter/releases)：Windows `.exe`、macOS `.dmg`、Linux `.AppImage`。
-
-只想在本机打 Windows 安装包：
-
-```bash
-npm run dist:win
-```
-
 ## 说明
 
-- 本仓库是 **桌面壳 + 本地插件** 的 alter；完整社区插件集仍可通过官方 dsh 配置文件安装。
-- 打包产物内含 `dsh-runtime`（`@deepseek-ai/dsh`）。体积较大属预期。
-- macOS / Windows 安装包默认 **未做代码签名**（未配置证书时）。
+- 本仓库是桌面壳与本地插件的增强版；更多社区插件仍可通过官方 dsh 配置安装。
+- 安装包体积较大属预期（内含 dsh 运行时）。
+- macOS / Windows 安装包默认未做代码签名。
 
 ## License
 
