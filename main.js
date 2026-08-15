@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 
 const { app, BrowserWindow, dialog, shell, Tray, Menu, nativeImage, screen, ipcMain } = require('electron');
 const { spawn, execFileSync } = require('child_process');
@@ -7,38 +7,12 @@ const path = require('path');
 const fs = require('fs');
 const net = require('net');
 
-const APP_USER_MODEL_ID = 'com.deepseek.harness.alter';
-
-function resolveDshRoot() {
-  // Packaged: extraResources/dsh-runtime
-  if (app.isPackaged) {
-    return path.join(process.resourcesPath, 'dsh-runtime');
-  }
-  const localRuntime = path.join(__dirname, 'dsh-runtime');
-  if (fs.existsSync(path.join(localRuntime, 'node_modules', '@deepseek-ai', 'dsh'))) {
-    return localRuntime;
-  }
-  // Local sibling install (Programs/deepseek-harness)
-  const sibling = path.resolve(__dirname, '..', 'deepseek-harness');
-  if (fs.existsSync(path.join(sibling, 'node_modules', '@deepseek-ai', 'dsh'))) {
-    return sibling;
-  }
-  return localRuntime;
-}
-
-function prefsDir() {
-  try {
-    return app.getPath('userData');
-  } catch (_) {
-    return __dirname;
-  }
-}
-
-let DSH_ROOT = resolveDshRoot();
+const DSH_ROOT = path.resolve(__dirname, '..');
+const APP_USER_MODEL_ID = 'com.deepseek.harness.desktop';
 const ICON_CANDIDATES = [
-  path.join(__dirname, 'assets', 'deepseek.ico'),
-  path.join(__dirname, 'assets', 'icon.png'),
+  path.join(DSH_ROOT, 'deepseek.ico'),
   path.join(__dirname, 'deepseek.ico'),
+  path.join(DSH_ROOT, 'deepseek-icon-180.png'),
 ];
 const ICON_PATH = ICON_CANDIDATES.find((p) => fs.existsSync(p)) || ICON_CANDIDATES[0];
 const DSH_CMD = path.join(DSH_ROOT, 'dsh.cmd');
@@ -49,15 +23,13 @@ if (process.platform === 'win32') {
 }
 const PET_HTML = path.join(__dirname, 'pet-desktop.html');
 const PET_PRELOAD = path.join(__dirname, 'pet-preload.js');
-const PET_PREFS_FILE = path.join(prefsDir(), 'pet-prefs.json');
-const NETWORK_PREFS_FILE = path.join(prefsDir(), 'network-prefs.json');
+const PET_PREFS_FILE = path.join(__dirname, 'pet-prefs.json');
+const NETWORK_PREFS_FILE = path.join(__dirname, 'network-prefs.json');
 const DEFAULT_PORT = 3080;
 const HOST = '127.0.0.1';
 const READY_TIMEOUT_MS = 90_000;
 const READY_POLL_MS = 400;
-function pidFile() {
-  return path.join(prefsDir(), 'dsh-server.pid');
-}
+const PID_FILE = path.join(__dirname, 'dsh-server.pid');
 const DEFAULT_PET_SIZE = { width: 280, height: 300 };
 const DEFAULT_CLASH_PORTS = [7897, 7890, 7891, 10809];
 
@@ -326,12 +298,8 @@ if (!gotLock) {
 function log(msg) {
   const line = `[dsh-desktop] ${new Date().toISOString()} ${msg}`;
   try {
-    fs.appendFileSync(path.join(prefsDir(), 'desktop.log'), line + '\n');
-  } catch (_) {
-    try {
-      fs.appendFileSync(path.join(__dirname, 'desktop.log'), line + '\n');
-    } catch (__) {}
-  }
+    fs.appendFileSync(path.join(__dirname, 'desktop.log'), line + '\n');
+  } catch (_) {}
   console.log(line);
 }
 
@@ -415,13 +383,13 @@ async function waitUntilPortFree(port, timeoutMs = 8000) {
 
 function cleanupStaleServer() {
   try {
-    if (fs.existsSync(pidFile())) {
-      const old = Number(String(fs.readFileSync(pidFile(), 'utf8')).trim());
+    if (fs.existsSync(PID_FILE)) {
+      const old = Number(String(fs.readFileSync(PID_FILE, 'utf8')).trim());
       if (old) {
         log(`cleanup stale pid file pid=${old}`);
         killPidTree(old);
       }
-      fs.unlinkSync(pidFile());
+      fs.unlinkSync(PID_FILE);
     }
   } catch (_) {}
   killStrayDshNodes();
@@ -499,23 +467,14 @@ function resolveNodeExecutable() {
 
 function startDsh(port) {
   return new Promise((resolve, reject) => {
-    DSH_ROOT = resolveDshRoot();
     const dshBin = path.join(DSH_ROOT, 'node_modules', '@deepseek-ai', 'dsh', 'lib', 'bin.js');
     const nodeExe = resolveNodeExecutable();
     const canDirect = fs.existsSync(dshBin) && (nodeExe !== 'node' || process.platform !== 'win32');
-    if (!fs.existsSync(dshBin) && !fs.existsSync(path.join(DSH_ROOT, 'dsh.cmd'))) {
-      reject(
-        new Error(
-          `未找到 DeepSeek Harness 运行时（dsh）。\n期望目录：${DSH_ROOT}\n请先执行 npm run prepare:dsh，或安装官方 dsh。`,
-        ),
-      );
-      return;
-    }
     const args = canDirect
       ? [dshBin, 'web', '--host', HOST, '--port', String(port)]
       : ['web', '--host', HOST, '--port', String(port)];
-    const exe = canDirect ? nodeExe : path.join(DSH_ROOT, 'dsh.cmd');
-    log(`spawn: ${exe} ${args.join(' ')} (dshRoot=${DSH_ROOT})`);
+    const exe = canDirect ? nodeExe : DSH_CMD;
+    log(`spawn: ${exe} ${args.join(' ')}`);
 
     const apiKey = readDeepSeekApiKey();
     const env = { ...process.env };
@@ -548,7 +507,7 @@ function startDsh(port) {
     });
 
     try {
-      fs.writeFileSync(pidFile(), String(dshProcess.pid));
+      fs.writeFileSync(PID_FILE, String(dshProcess.pid));
     } catch (_) {}
 
     let settled = false;
@@ -564,7 +523,7 @@ function startDsh(port) {
     dshProcess.on('exit', (code, signal) => {
       log(`dsh exited code=${code} signal=${signal}`);
       try {
-        if (fs.existsSync(pidFile())) fs.unlinkSync(pidFile());
+        if (fs.existsSync(PID_FILE)) fs.unlinkSync(PID_FILE);
       } catch (_) {}
       if (!settled && !shuttingDown) {
         fail(new Error(`dsh exited early (code=${code})`));
@@ -1118,7 +1077,7 @@ async function boot() {
     if (splashWindow && !splashWindow.isDestroyed()) splashWindow.close();
     dialog.showErrorBox(
       'DeepSeek Harness 启动失败',
-      `${err.message}\n\n若反复卡住：先完全退出托盘图标，再重新打开。\n详情见：${path.join(prefsDir(), 'desktop.log')}`,
+      `${err.message}\n\n若反复卡住：先完全退出托盘图标，再重新打开。\n详情见：${path.join(__dirname, 'desktop.log')}`,
     );
     killDshTree();
     app.quit();

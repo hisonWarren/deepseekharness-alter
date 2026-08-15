@@ -51,13 +51,13 @@ npm start
 
 ## 发版（与 Lumina 相同：打 tag 触发 CI）
 
-1. 更新 `package.json` 的 `version`（如 `0.2.0`）
+1. 更新 `package.json` 的 `version`（如 `0.2.1`）
 2. 提交并推送到 `main`
 3. 打 tag 并推送：
 
 ```bash
-git tag v0.2.0
-git push origin v0.2.0
+git tag v0.2.1
+git push origin v0.2.1
 ```
 
 GitHub Actions [Release](.github/workflows/release.yml) 会构建 Win / macOS / Linux 并上传到 Releases。
