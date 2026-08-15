@@ -1,28 +1,22 @@
 # Changelog
 
+## 0.2.4 — 2026-08-15
+
+### Fixed
+- API calls ignored “强制代理” because `api.deepseek.com` was on `NO_PROXY`.
+- In-app pet could stay invisible when dual-buffer CSS hid every video before `.is-front` existed.
+- User bubble actions: copy / edit use icons (aligned with official message chrome).
+
 ## 0.2.3 — 2026-08-15
 
 ### Fixed
-- Packaged app failed with `dsh exited early (code=1)`: resolve runtime from `resources/dsh-runtime` instead of the parent of `app.asar`.
-- Write `desktop.log` / prefs / pid into userData (asar is read-only).
+- Packaged app `dsh exited early`: resolve `resources/dsh-runtime`; logs/prefs in userData.
 
 ## 0.2.2 — 2026-08-15
 
 ### Fixed
-- App icon too small for electron-builder (`icon.png` now 1024×1024).
+- App icon 1024×1024 for electron-builder.
 
-## 0.2.1 — 2026-08-15
+## 0.2.1 / 0.2.0 / 0.1.0
 
-### Fixed
-- Root `package.json` UTF-8 BOM broke electron-builder on CI.
-- Sync latest desktop-shell `main.js`.
-- `dsh-ux-polish` shadows chat nodes at `priority: -10`.
-
-## 0.2.0 — 2026-08-15
-
-### Added
-- Inline user-message edit (`dsh-ux-polish`) with fork/branch semantics.
-
-## 0.1.0
-
-- Initial desktop shell alter + Release CI (win/mac/linux).
+- See git history.

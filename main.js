@@ -190,8 +190,8 @@ function applyProxyEnv(env, resolved) {
   ]) {
     delete env[k];
   }
-  // Keep loopback free even when forcing a proxy.
-  const noProxy = ['127.0.0.1', 'localhost', '::1', 'api.deepseek.com'];
+  // Loopback only — never put api.deepseek.com here or "强制代理" is silently bypassed.
+  const noProxy = ['127.0.0.1', 'localhost', '::1'];
   env.NO_PROXY = [...new Set([...(env.NO_PROXY || '').split(',').map((s) => s.trim()).filter(Boolean), ...noProxy])].join(',');
   env.no_proxy = env.NO_PROXY;
   if (resolved.proxyUrl) {
@@ -905,22 +905,24 @@ function applyInAppPetVisibility() {
     ? `
       .dsh-pet-root, #dsh-pet-root {
         z-index: 200 !important; /* Explorer panel=50, toggle=55 */
+        display: block !important;
         visibility: visible !important;
+        opacity: 1 !important;
         --dsh-pet-size: ${size}px !important;
       }
       .dsh-pet-root .dsh-pet-stage, #dsh-pet-root .dsh-pet-stage {
         width: ${size}px !important;
         height: ${size}px !important;
       }
-      /* Dual-buffer pet: ONLY the front video is visible. */
       .dsh-pet-root .dsh-pet-video, #dsh-pet-root .dsh-pet-video,
       .dsh-pet-root video, #dsh-pet-root video {
         pointer-events: auto !important;
       }
-      .dsh-pet-root .dsh-pet-video:not(.is-front),
-      #dsh-pet-root .dsh-pet-video:not(.is-front),
-      .dsh-pet-root video:not(.is-front),
-      #dsh-pet-root video:not(.is-front) {
+      /* Only hide the back buffer once a front frame is marked — otherwise both stay invisible. */
+      .dsh-pet-root:has(.is-front) .dsh-pet-video:not(.is-front),
+      #dsh-pet-root:has(.is-front) .dsh-pet-video:not(.is-front),
+      .dsh-pet-root:has(video.is-front) video:not(.is-front),
+      #dsh-pet-root:has(video.is-front) video:not(.is-front) {
         opacity: 0 !important;
       }
       .dsh-pet-root .dsh-pet-video.is-front,

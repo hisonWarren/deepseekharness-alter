@@ -7,6 +7,10 @@ window.__ModuleLoader__.load({
 
 		const react = require("react");
 		const { jsx, jsxs, Fragment } = require("react/jsx-runtime");
+		let primitives = null;
+		try {
+			primitives = require("@deepseek-ai/dsh-client-ui-primitives");
+		} catch (_) {}
 
 		const CSS_ID = "dsh-ux-polish/style.css";
 		const css = [
@@ -18,16 +22,64 @@ window.__ModuleLoader__.load({
 			".dshUxBubble.is-editing{width:min(100%,560px);padding:0;background:transparent}",
 			".dshUxEdit{width:100%;min-height:88px;max-height:40vh;resize:vertical;box-sizing:border-box;padding:10px 14px;border-radius:18px;border:1px solid var(--dsw-alias-border-l2,rgba(127,127,127,.28));background:var(--dsw-alias-bg-primary,transparent);color:inherit;font:inherit;line-height:1.5}",
 			".dshUxEdit:focus{outline:2px solid var(--dsw-static-deepseek-500,#4d6bfe);outline-offset:1px}",
-			".dshUxActions{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-right:2px}",
-			".dshUxBtn{appearance:none;border:0;background:transparent;color:inherit;opacity:.72;cursor:pointer;padding:4px 8px;font-size:12px;line-height:1.2;border-radius:6px}",
+			".dshUxActions{display:flex;flex-wrap:wrap;align-items:center;gap:2px;margin-right:2px}",
+			".dshUxBtn{appearance:none;border:0;background:transparent;color:inherit;opacity:.72;cursor:pointer;padding:4px;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;line-height:0}",
 			".dshUxBtn:hover{opacity:1;background:rgba(127,127,127,.12)}",
 			".dshUxBtn:disabled{opacity:.4;cursor:default}",
-			".dshUxBtnPrimary{opacity:1;background:var(--dsw-static-deepseek-500,#4d6bfe);color:#fff}",
+			".dshUxBtnPrimary{opacity:1;width:auto;height:auto;padding:4px 10px;font-size:12px;line-height:1.2;background:var(--dsw-static-deepseek-500,#4d6bfe);color:#fff}",
 			".dshUxBtnPrimary:hover{filter:brightness(1.05)}",
+			".dshUxBtnText{width:auto;height:auto;padding:4px 8px;font-size:12px;line-height:1.2}",
 			".dshUxHint{max-width:min(100%,560px);font-size:12px;line-height:1.35;color:var(--dsw-alias-label-caption,rgba(127,127,127,.85));text-align:right}",
 			".dshUxErr{max-width:min(100%,560px);font-size:12px;line-height:1.35;color:var(--dsw-alias-state-error-primary,#c44);text-align:right}",
-			".dshUxMeta{font-size:11px;opacity:.55;margin-right:4px}",
+			".dshUxMeta{font-size:11px;opacity:.55;margin-right:6px}",
+			".dshUxIcon{width:16px;height:16px;display:block}",
 		].join("");
+
+		function IconCopy({ checked }) {
+			if (primitives) {
+				const Comp = checked ? primitives.IconCheckOutline16 : primitives.IconCopyOutline16;
+				if (Comp) return jsx(Comp, {});
+			}
+			if (checked) {
+				return jsx("svg", {
+					className: "dshUxIcon",
+					viewBox: "0 0 16 16",
+					fill: "none",
+					stroke: "currentColor",
+					strokeWidth: "1.5",
+					"aria-hidden": true,
+					children: jsx("path", { d: "M3.5 8.5 6.5 11.5 12.5 4.5" }),
+				});
+			}
+			return jsx("svg", {
+				className: "dshUxIcon",
+				viewBox: "0 0 16 16",
+				fill: "none",
+				stroke: "currentColor",
+				strokeWidth: "1.5",
+				"aria-hidden": true,
+				children: [
+					jsx("rect", { x: "5.5", y: "5.5", width: "8", height: "8", rx: "1.5" }),
+					jsx("path", { d: "M10.5 5.5V4A1.5 1.5 0 0 0 9 2.5H4A1.5 1.5 0 0 0 2.5 4v5A1.5 1.5 0 0 0 4 10.5h1.5" }),
+				],
+			});
+		}
+
+		function IconEdit() {
+			if (primitives?.IconEditOutline16) return jsx(primitives.IconEditOutline16, { size: 16 });
+			return jsx("svg", {
+				className: "dshUxIcon",
+				viewBox: "0 0 16 16",
+				fill: "none",
+				stroke: "currentColor",
+				strokeWidth: "1.5",
+				"aria-hidden": true,
+				children: [
+					jsx("path", { d: "m3.5 12.5 1.2-4.2L11 2.5l2.5 2.5-6.3 6.3-4.2 1.2Z" }),
+					jsx("path", { d: "m9.8 3.7 2.5 2.5" }),
+				],
+			});
+		}
 
 		function ensureCss() {
 			if (typeof document === "undefined") return;
@@ -273,7 +325,7 @@ window.__ModuleLoader__.load({
 										children: [
 											jsx("button", {
 												type: "button",
-												className: "dshUxBtn",
+												className: "dshUxBtn dshUxBtnText",
 												disabled: busy,
 												onClick: onCancel,
 												children: "取消",
@@ -305,15 +357,17 @@ window.__ModuleLoader__.load({
 										type: "button",
 										className: "dshUxBtn",
 										title: "复制",
+										"aria-label": "复制",
 										onClick: onCopy,
-										children: copied ? "已复制" : "复制",
+										children: jsx(IconCopy, { checked: copied }),
 									}),
 									jsx("button", {
 										type: "button",
 										className: "dshUxBtn",
-										title: "就地编辑并分支到新对话（类似 ChatGPT）",
+										title: "编辑并分支到新对话",
+										"aria-label": "编辑",
 										onClick: onStartEdit,
-										children: "编辑",
+										children: jsx(IconEdit, {}),
 									}),
 								],
 							}),
