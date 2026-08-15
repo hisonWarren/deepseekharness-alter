@@ -1,6 +1,6 @@
 {
   "name": "deepseekharness-alter",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "private": false,
   "description": "Desktop shell alter for DeepSeek Harness - tray pet controls, UX polish, stable Windows boot",
   "author": "hisonWarren",
@@ -46,6 +46,8 @@
       "main.js",
       "pet-desktop.html",
       "pet-preload.js",
+      "proxy-prefs.html",
+      "proxy-prefs-preload.js",
       "launch.bat",
       "launch-silent.ps1",
       "launch-silent.vbs",

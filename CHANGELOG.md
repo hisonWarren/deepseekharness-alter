@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.5 — 2026-08-15
+
+### Added
+- Tray **网络 → 设置代理地址…**: users can set their own proxy URL/port (not only Clash 7897).
+
 ## 0.2.4 — 2026-08-15
 
 ### Fixed

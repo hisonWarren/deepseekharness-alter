@@ -105,6 +105,75 @@ function saveNetworkPrefs(patch) {
   return networkPrefs;
 }
 
+/** Accept full URL, host:port, or bare port (→ http://127.0.0.1:PORT). */
+function normalizeProxyUrl(raw) {
+  let s = String(raw || '').trim();
+  if (!s) return { ok: false, error: '代理地址不能为空' };
+  if (/^\d{2,5}$/.test(s)) {
+    const port = Number(s);
+    if (port < 1 || port > 65535) return { ok: false, error: '端口无效' };
+    s = `http://127.0.0.1:${port}`;
+  } else if (/^[\w.-]+:\d{2,5}$/.test(s)) {
+    s = `http://${s}`;
+  }
+  let u;
+  try {
+    u = new URL(s);
+  } catch (_) {
+    return { ok: false, error: '格式无效，例如 http://127.0.0.1:7897 或 7897' };
+  }
+  const proto = u.protocol.toLowerCase();
+  if (!['http:', 'https:', 'socks:', 'socks4:', 'socks5:'].includes(proto)) {
+    return { ok: false, error: '仅支持 http / https / socks5' };
+  }
+  if (!u.hostname) return { ok: false, error: '缺少主机名' };
+  const port = u.port ? Number(u.port) : proto === 'https:' ? 443 : 80;
+  if (!Number.isFinite(port) || port < 1 || port > 65535) {
+    return { ok: false, error: '端口无效' };
+  }
+  // Keep explicit form so logs/tray show the exact URL users set.
+  return { ok: true, url: s };
+}
+
+let proxyPrefsWindow = null;
+
+function openProxyPrefsWindow() {
+  if (proxyPrefsWindow && !proxyPrefsWindow.isDestroyed()) {
+    proxyPrefsWindow.focus();
+    return;
+  }
+  const parent =
+    mainWindow && !mainWindow.isDestroyed()
+      ? mainWindow
+      : BrowserWindow.getFocusedWindow() || undefined;
+  proxyPrefsWindow = new BrowserWindow({
+    width: 440,
+    height: 300,
+    resizable: false,
+    minimizable: false,
+    maximizable: false,
+    fullscreenable: false,
+    autoHideMenuBar: true,
+    title: '代理设置',
+    parent,
+    modal: Boolean(parent),
+    show: false,
+    webPreferences: {
+      preload: path.join(__dirname, 'proxy-prefs-preload.js'),
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: false,
+    },
+  });
+  proxyPrefsWindow.loadFile(path.join(__dirname, 'proxy-prefs.html'));
+  proxyPrefsWindow.once('ready-to-show', () => {
+    if (proxyPrefsWindow && !proxyPrefsWindow.isDestroyed()) proxyPrefsWindow.show();
+  });
+  proxyPrefsWindow.on('closed', () => {
+    proxyPrefsWindow = null;
+  });
+}
+
 function isLocalPortOpen(port) {
   try {
     const script = `$c=New-Object Net.Sockets.TcpClient; try { $c.Connect('127.0.0.1',${Number(port)}); $c.Close(); '1' } catch { '0' }`;
@@ -875,10 +944,15 @@ function createTray() {
                   type: 'info',
                   title: '网络模式',
                   message:
-                    '已强制走本地代理（默认 Clash 7897）。请退出后重新打开 DeepSeek Harness。\n可在 desktop-shell/network-prefs.json 修改 proxyUrl。',
+                    `已强制走代理：${networkPrefs.proxyUrl || 'http://127.0.0.1:7897'}\n请退出后重新打开使设置生效。\n端口不同时，用下方「设置代理地址…」。`,
                 });
                 rebuild();
               },
+            },
+            { type: 'separator' },
+            {
+              label: '设置代理地址…',
+              click: () => openProxyPrefsWindow(),
             },
           ],
         },
@@ -1165,6 +1239,34 @@ function forceQuit(reason) {
 if (gotLock) {
   app.whenReady().then(boot);
 }
+
+ipcMain.handle('proxy-prefs-load', () => ({
+  mode: networkPrefs.mode,
+  proxyUrl: networkPrefs.proxyUrl || 'http://127.0.0.1:7897',
+}));
+
+ipcMain.handle('proxy-prefs-save', (_e, rawUrl) => {
+  const normalized = normalizeProxyUrl(rawUrl);
+  if (!normalized.ok) return normalized;
+  saveNetworkPrefs({ proxyUrl: normalized.url });
+  log(`proxy url set to ${normalized.url}`);
+  if (typeof createTray._rebuild === 'function') createTray._rebuild();
+  if (proxyPrefsWindow && !proxyPrefsWindow.isDestroyed()) proxyPrefsWindow.close();
+  dialog.showMessageBox({
+    type: 'info',
+    title: '代理地址已保存',
+    message:
+      `当前代理：${normalized.url}\n` +
+      (networkPrefs.mode === 'proxy'
+        ? '已在「强制代理」模式。请退出后重新打开使设置生效。'
+        : '已保存地址。请在托盘「网络」里选择「强制代理」，再退出并重新打开。'),
+  });
+  return { ok: true, url: normalized.url };
+});
+
+ipcMain.on('proxy-prefs-cancel', () => {
+  if (proxyPrefsWindow && !proxyPrefsWindow.isDestroyed()) proxyPrefsWindow.close();
+});
 
 ipcMain.on('pet-open-main', () => {
   showMainWindow();
