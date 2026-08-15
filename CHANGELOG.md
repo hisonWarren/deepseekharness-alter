@@ -1,26 +1,30 @@
 # Changelog
 
-## 0.2.5 — 2026-08-15
-
-### Added
-- Tray **网络 → 设置代理地址…**: users can set their own proxy URL/port (not only Clash 7897).
-
-## 0.2.4 — 2026-08-15
+## 0.2.6 — 2026-08-15
 
 ### Fixed
-- API calls ignored “强制代理” because `api.deepseek.com` was on `NO_PROXY`.
+- Sanitize `DEEPSEEK_BASE_URL` (strip `[...]` / quotes / trailing `/v1`) so a polluted Windows env var cannot break fetch with Invalid URL.
+## 0.2.5 鈥?2026-08-15
+
+### Added
+- Tray **缃戠粶 鈫?璁剧疆浠ｇ悊鍦板潃鈥?*: users can set their own proxy URL/port (not only Clash 7897).
+
+## 0.2.4 鈥?2026-08-15
+
+### Fixed
+- API calls ignored 鈥滃己鍒朵唬鐞嗏€?because `api.deepseek.com` was on `NO_PROXY`.
 - In-app pet could stay invisible when dual-buffer CSS hid every video before `.is-front` existed.
 - User bubble actions: copy / edit use icons (aligned with official message chrome).
 
-## 0.2.3 — 2026-08-15
+## 0.2.3 鈥?2026-08-15
 
 ### Fixed
 - Packaged app `dsh exited early`: resolve `resources/dsh-runtime`; logs/prefs in userData.
 
-## 0.2.2 — 2026-08-15
+## 0.2.2 鈥?2026-08-15
 
 ### Fixed
-- App icon 1024×1024 for electron-builder.
+- App icon 1024脳1024 for electron-builder.
 
 ## 0.2.1 / 0.2.0 / 0.1.0
 

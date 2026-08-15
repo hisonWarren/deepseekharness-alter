@@ -545,6 +545,26 @@ function readDeepSeekApiKey() {
   }
 }
 
+/**
+ * Sanitize DEEPSEEK_BASE_URL from shell/user env.
+ * Common footgun: copying UI text like `[https://api.deepseek.com/v1]` into the env var.
+ * Adapter appends `/chat/completions`, so strip a trailing `/v1`.
+ */
+function normalizeDeepSeekBaseUrl(raw) {
+  let s = String(raw || '').trim();
+  if (!s) return 'https://api.deepseek.com';
+  s = s.replace(/^['"]+|['"]+$/g, '');
+  s = s.replace(/^\[+|\]+$/g, '');
+  s = s.trim();
+  s = s.replace(/\/+$/, '');
+  s = s.replace(/\/v1$/i, '');
+  if (!/^https?:\/\//i.test(s)) {
+    log(`WARNING: invalid DEEPSEEK_BASE_URL=${JSON.stringify(raw)}; falling back to public API`);
+    return 'https://api.deepseek.com';
+  }
+  return s;
+}
+
 function resolveNodeExecutable() {
   if (process.platform === 'win32') {
     const candidates = [
@@ -590,11 +610,8 @@ function startDsh(port) {
     }
     // Prefer IPv4 for DeepSeek TLS; some Windows stacks flap on IPv6 → TRANSPORT errors.
     env.NODE_OPTIONS = [env.NODE_OPTIONS, '--dns-result-order=ipv4first'].filter(Boolean).join(' ').trim();
-    if (!env.DEEPSEEK_BASE_URL) {
-      env.DEEPSEEK_BASE_URL = 'https://api.deepseek.com';
-    }
-    // Normalize accidental .../v1 base (adapter already appends /chat/completions).
-    env.DEEPSEEK_BASE_URL = String(env.DEEPSEEK_BASE_URL).replace(/\/v1\/?$/, '');
+    env.DEEPSEEK_BASE_URL = normalizeDeepSeekBaseUrl(env.DEEPSEEK_BASE_URL);
+    log(`DEEPSEEK_BASE_URL=${env.DEEPSEEK_BASE_URL}`);
     const resolved = resolveOutboundProxy();
     applyProxyEnv(env, resolved);
     log(
