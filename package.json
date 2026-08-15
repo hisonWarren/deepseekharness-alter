@@ -1,0 +1,117 @@
+﻿{
+  "name": "deepseekharness-alter",
+  "version": "0.1.0",
+  "private": false,
+  "description": "Desktop shell alter for DeepSeek Harness 鈥?tray pet controls, UX polish, stable Windows boot",
+  "author": "hisonWarren",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hisonWarren/deepseekharness-alter.git"
+  },
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "prepare:dsh": "node tools/prepare-dsh-runtime.cjs",
+    "postinstall": "node tools/postinstall.cjs",
+    "dist": "npm run prepare:dsh && electron-builder --publish never",
+    "dist:dir": "npm run prepare:dsh && electron-builder --dir --publish never",
+    "dist:win": "npm run prepare:dsh && electron-builder --win --publish never",
+    "dist:mac": "npm run prepare:dsh && electron-builder --mac --publish never",
+    "dist:linux": "npm run prepare:dsh && electron-builder --linux --publish never"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "electron": "^43.4.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.hisonwarren.deepseekharness.alter",
+    "productName": "DeepSeek Harness Alter",
+    "copyright": "漏 hisonWarren",
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "hisonWarren",
+        "repo": "deepseekharness-alter"
+      }
+    ],
+    "directories": {
+      "buildResources": "assets",
+      "output": "release"
+    },
+    "files": [
+      "main.js",
+      "pet-desktop.html",
+      "pet-preload.js",
+      "launch.bat",
+      "launch-silent.ps1",
+      "launch-silent.vbs",
+      "restart-clean.cmd",
+      "network-prefs.example.json",
+      "pet-prefs.example.json",
+      "plugins-local/**/*",
+      "assets/**/*",
+      "tools/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "dsh-runtime",
+        "to": "dsh-runtime",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.png",
+      "artifactName": "DeepSeekHarness-Alter-${version}-windows-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": false,
+      "shortcutName": "DeepSeek Harness Alter"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.png",
+      "category": "public.app-category.productivity",
+      "artifactName": "DeepSeekHarness-Alter-${version}-macos-${arch}.${ext}"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.png",
+      "category": "Office",
+      "artifactName": "DeepSeekHarness-Alter-${version}-linux-${arch}.${ext}"
+    }
+  }
+}
+

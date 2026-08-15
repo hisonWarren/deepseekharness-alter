@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; media-src http://127.0.0.1:* http://localhost:*; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:;" />
+  <title>DeepSeek Pet</title>
+  <style>
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    #stage {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      cursor: grab;
+      /* Do NOT use -webkit-app-region:drag — video hit-target would break it. */
+    }
+    #stage.is-dragging { cursor: grabbing; }
+    video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: transparent;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .18s ease;
+    }
+    video.is-front { opacity: 1; }
+    #bubble {
+      position: absolute;
+      left: 50%;
+      bottom: 88%;
+      transform: translateX(-50%);
+      max-width: 92%;
+      padding: 6px 10px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.94);
+      color: #1d1d1f;
+      font: 12px/1.4 "Segoe UI", "Microsoft YaHei", sans-serif;
+      box-shadow: 0 4px 16px rgba(0,0,0,.12);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease;
+      white-space: nowrap;
+    }
+    #bubble.show { opacity: 1; }
+    #badge {
+      position: absolute;
+      left: 50%;
+      bottom: 6px;
+      transform: translateX(-50%);
+      padding: 2px 8px;
+      border-radius: 999px;
+      font: 600 10px/1.4 "Segoe UI", "Microsoft YaHei", sans-serif;
+      color: #fff;
+      background: rgba(60,60,67,.55);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease;
+      white-space: nowrap;
+    }
+    #badge.show { opacity: 1; }
+    #badge.work { background: rgba(0,122,255,.85); }
+    #badge.think { background: rgba(175,82,222,.85); }
+    #badge.done { background: rgba(52,199,89,.85); }
+  </style>
+</head>
+<body>
+  <div id="stage">
+    <div id="bubble"></div>
+    <video id="a" muted playsinline></video>
+    <video id="b" muted playsinline></video>
+    <div id="badge"></div>
+  </div>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const port = params.get('port') || '3080';
+    const base = `http://127.0.0.1:${port}/pet/thumb/`;
+    const DRAG_THRESHOLD = 5; // match dsh-pet community idiom
+
+    const IDLE = '待机呼吸休闲.webm';
+    const WORK = '原地敲击桌面互动.webm';
+    const THINK = '原地专心玩魔方.webm';
+    const DONE = '点击回应 - 开心跃动.webm';
+    const ACTS = [
+      '悠闲哼歌.webm',
+      '超大伸懒腰.webm',
+      '原地专心玩魔方.webm',
+      '原地敲击桌面互动.webm',
+      '原地重力下蹲压缩.webm',
+      '哈欠连天.webm',
+      '原地小憩沉眠.webm',
+      '原地蹲下玩玩具汽车.webm',
+      '鲸鱼吐泡泡特效.webm',
+      '女仆屈膝礼仪.webm',
+      '被吓一跳（炸毛）.webm',
+      '原地跳跃抓碎头顶物品.webm',
+      '小幅度原地 360 度旋转展示.webm',
+      '偷吃零食被抓住.webm',
+      '东张西望.webm',
+      '螃蟹走路.webm',
+      '玩游戏气急败坏.webm',
+      '用鲸鱼尾巴拍打地面.webm',
+    ];
+    const CLICKS = [
+      '点击回应 - 开心跃动.webm',
+      '点击回应 - 害羞惊讶.webm',
+      '点击回应 - 傲娇生气（侧身展示）.webm',
+      '打瞌睡被惊醒.webm',
+    ];
+    const LINES = [
+      '戳戳～我在这儿',
+      '拖我可以移动位置',
+      '双击打开主窗口',
+      '右键看更多选项',
+      '主窗口关了我也在哦',
+      '喝口水休息一下吧',
+    ];
+
+    const stage = document.getElementById('stage');
+    const va = document.getElementById('a');
+    const vb = document.getElementById('b');
+    const bubble = document.getElementById('bubble');
+    const badge = document.getElementById('badge');
+    let front = va;
+    let back = vb;
+    let busy = false;
+    let facingRight = false;
+    let agentMode = 'idle'; // idle | work | think | done
+    let suppressRandom = false;
+
+    function urlOf(name) {
+      return base + encodeURIComponent(name);
+    }
+
+    function showBubble(text) {
+      bubble.textContent = text;
+      bubble.classList.add('show');
+      clearTimeout(showBubble._t);
+      showBubble._t = setTimeout(() => bubble.classList.remove('show'), 2200);
+    }
+
+    function setBadge(text, cls) {
+      if (!text) {
+        badge.className = '';
+        badge.classList.remove('show');
+        badge.textContent = '';
+        return;
+      }
+      badge.textContent = text;
+      badge.className = cls || '';
+      badge.classList.add('show');
+    }
+
+    function play(name, { loop = false } = {}) {
+      return new Promise((resolve) => {
+        back.src = urlOf(name);
+        back.loop = !!loop;
+        const done = () => {
+          back.removeEventListener('ended', done);
+          back.removeEventListener('error', fail);
+          resolve(true);
+        };
+        const fail = () => {
+          back.removeEventListener('ended', done);
+          back.removeEventListener('error', fail);
+          resolve(false);
+        };
+        back.addEventListener('ended', done, { once: true });
+        back.addEventListener('error', fail, { once: true });
+        const p = back.play();
+        if (p && p.catch) p.catch(() => resolve(false));
+        back.classList.add('is-front');
+        front.classList.remove('is-front');
+        const tmp = front;
+        front = back;
+        back = tmp;
+        if (loop) resolve(true);
+      });
+    }
+
+    async function goIdle() {
+      busy = false;
+      if (agentMode === 'work') {
+        await play(WORK, { loop: true });
+        return;
+      }
+      if (agentMode === 'think') {
+        await play(THINK, { loop: true });
+        return;
+      }
+      await play(IDLE, { loop: true });
+    }
+
+    async function playOnce(name) {
+      if (busy) return;
+      busy = true;
+      await play(name, { loop: false });
+      await goIdle();
+    }
+
+    async function applyAgentStatus(status) {
+      const next = (status && status.mode) || 'idle';
+      if (next === agentMode) return;
+      agentMode = next;
+      suppressRandom = next === 'work' || next === 'think';
+      if (next === 'work') {
+        setBadge('工作中', 'work');
+        showBubble(status.message || '正在处理任务…');
+        busy = false;
+        await play(WORK, { loop: true });
+      } else if (next === 'think') {
+        setBadge('思考中', 'think');
+        showBubble(status.message || '让我想想…');
+        busy = false;
+        await play(THINK, { loop: true });
+      } else if (next === 'done') {
+        setBadge('完成', 'done');
+        showBubble(status.message || '搞定啦～');
+        busy = false;
+        await playOnce(DONE);
+        agentMode = 'idle';
+        setTimeout(() => setBadge('', ''), 2500);
+      } else {
+        setBadge('', '');
+        await goIdle();
+      }
+    }
+
+    // ---------- IPC drag (community pointer-capture style) ----------
+    let drag = null; // { startX, startY, originX, originY, moved, pointerId }
+
+    stage.addEventListener('pointerdown', async (e) => {
+      if (e.button !== 0) return;
+      e.preventDefault();
+      const bounds = (window.dshPet && (await window.dshPet.getBounds())) || { x: 0, y: 0 };
+      drag = {
+        startX: e.screenX,
+        startY: e.screenY,
+        originX: bounds.x,
+        originY: bounds.y,
+        moved: false,
+        pointerId: e.pointerId,
+      };
+      try { stage.setPointerCapture(e.pointerId); } catch (_) {}
+      stage.classList.add('is-dragging');
+    });
+
+    stage.addEventListener('pointermove', (e) => {
+      if (!drag) return;
+      const dx = e.screenX - drag.startX;
+      const dy = e.screenY - drag.startY;
+      if (!drag.moved && Math.hypot(dx, dy) < DRAG_THRESHOLD) return;
+      drag.moved = true;
+      if (window.dshPet && window.dshPet.setPosition) {
+        window.dshPet.setPosition(drag.originX + dx, drag.originY + dy);
+      }
+    });
+
+    function endDrag(e) {
+      if (!drag) return;
+      const wasMoved = drag.moved;
+      const dx = e.screenX - drag.startX;
+      const dy = e.screenY - drag.startY;
+      const finalMoved = wasMoved || Math.hypot(dx, dy) >= DRAG_THRESHOLD;
+      if (finalMoved && window.dshPet && window.dshPet.savePosition) {
+        window.dshPet.savePosition(drag.originX + dx, drag.originY + dy);
+      }
+      try { stage.releasePointerCapture(drag.pointerId); } catch (_) {}
+      stage.classList.remove('is-dragging');
+      const result = { moved: finalMoved };
+      drag = null;
+      return result;
+    }
+
+    stage.addEventListener('pointerup', (e) => {
+      if (e.button !== 0) return;
+      const result = endDrag(e);
+      if (!result) return;
+      if (result.moved) return; // drag ≠ click
+      // single click = poke / animate only (Codex / dsh-pet model)
+      const name = CLICKS[Math.floor(Math.random() * CLICKS.length)];
+      playOnce(name);
+      showBubble(LINES[Math.floor(Math.random() * LINES.length)]);
+      if (window.dshPet && window.dshPet.poke) window.dshPet.poke();
+    });
+
+    stage.addEventListener('pointercancel', (e) => {
+      endDrag(e || { screenX: 0, screenY: 0 });
+    });
+
+    stage.addEventListener('dblclick', (e) => {
+      e.preventDefault();
+      if (window.dshPet && window.dshPet.openMain) window.dshPet.openMain();
+    });
+
+    stage.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      if (window.dshPet && window.dshPet.menu) window.dshPet.menu();
+    });
+
+    async function boot() {
+      if (window.dshPet && window.dshPet.loadPrefs) {
+        const prefs = await window.dshPet.loadPrefs();
+        if (prefs && prefs.opacity != null) {
+          stage.style.opacity = String(prefs.opacity);
+        }
+      }
+      if (window.dshPet && window.dshPet.onPrefs) {
+        window.dshPet.onPrefs((prefs) => {
+          if (prefs && prefs.opacity != null) stage.style.opacity = String(prefs.opacity);
+        });
+      }
+      if (window.dshPet && window.dshPet.onStatus) {
+        window.dshPet.onStatus((status) => applyAgentStatus(status));
+      }
+      await goIdle();
+      setInterval(() => {
+        if (busy || suppressRandom || document.hidden || agentMode !== 'idle') return;
+        if (Math.random() > 0.35) return;
+        const name = ACTS[Math.floor(Math.random() * ACTS.length)];
+        if (name === '东张西望.webm') {
+          playOnce(name).then(() => {
+            facingRight = !facingRight;
+            stage.style.transform = facingRight ? 'scaleX(-1)' : '';
+          });
+        } else {
+          playOnce(name);
+        }
+      }, 18000);
+    }
+
+    boot();
+  </script>
+</body>
+</html>
