@@ -1036,6 +1036,13 @@ function applyInAppPetVisibility() {
         opacity: 1 !important;
         --dsh-pet-size: ${size}px !important;
       }
+      /* Default corner lift — skipped when React drag sets inline top (bottom:auto inline wins over non-important). */
+      .dsh-pet-root[data-corner="bottom-left"],
+      #dsh-pet-root[data-corner="bottom-left"],
+      .dsh-pet-root[data-corner="bottom-right"],
+      #dsh-pet-root[data-corner="bottom-right"] {
+        bottom: 56px;
+      }
       .dsh-pet-root .dsh-pet-stage, #dsh-pet-root .dsh-pet-stage {
         width: ${size}px !important;
         height: ${size}px !important;
