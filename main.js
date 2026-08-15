@@ -285,6 +285,10 @@ function normalizeInAppSize(raw) {
   return Math.min(360, Math.max(140, Math.round(n)));
 }
 
+function normalizeInAppCorner(raw) {
+  return raw === 'bottom-right' ? 'bottom-right' : 'bottom-left';
+}
+
 function loadPetPrefs() {
   const fallback = {
     x: null,
@@ -295,6 +299,8 @@ function loadPetPrefs() {
     enabled: true,
     inAppEnabled: true,
     inAppSize: 200,
+    // Default left: right side is covered by Explorer.
+    inAppCorner: 'bottom-left',
   };
   try {
     if (!fs.existsSync(PET_PREFS_FILE)) return fallback;
@@ -308,6 +314,7 @@ function loadPetPrefs() {
       enabled: raw.enabled !== false,
       inAppEnabled: raw.inAppEnabled !== false,
       inAppSize: normalizeInAppSize(raw.inAppSize ?? 200),
+      inAppCorner: normalizeInAppCorner(raw.inAppCorner),
     };
   } catch (_) {
     return fallback;
@@ -856,6 +863,33 @@ function createTray() {
               },
             },
             { type: 'separator' },
+            {
+              label: '左下角（避开 Explorer）',
+              type: 'radio',
+              checked: normalizeInAppCorner(petPrefs.inAppCorner) === 'bottom-left',
+              click: () => {
+                savePetPrefs({ inAppCorner: 'bottom-left', inAppEnabled: true });
+                applyInAppPetVisibility();
+                if (mainWindow && !mainWindow.isDestroyed()) {
+                  mainWindow.webContents.reload();
+                }
+                rebuild();
+              },
+            },
+            {
+              label: '右下角',
+              type: 'radio',
+              checked: normalizeInAppCorner(petPrefs.inAppCorner) === 'bottom-right',
+              click: () => {
+                savePetPrefs({ inAppCorner: 'bottom-right', inAppEnabled: true });
+                applyInAppPetVisibility();
+                if (mainWindow && !mainWindow.isDestroyed()) {
+                  mainWindow.webContents.reload();
+                }
+                rebuild();
+              },
+            },
+            { type: 'separator' },
             ...IN_APP_PET_SIZES.map((opt) => ({
               label: opt.label,
               type: 'radio',
@@ -987,11 +1021,12 @@ function createTray() {
   tray.on('double-click', () => showMainWindow());
 }
 
-/** Raise in-app pet above Explorer; apply size; never force both videos opaque. */
+/** Raise in-app pet above Explorer; apply size/corner; never force both videos opaque. */
 function applyInAppPetVisibility() {
   if (!mainWindow || mainWindow.isDestroyed()) return;
   const show = petPrefs.inAppEnabled !== false;
   const size = normalizeInAppSize(petPrefs.inAppSize);
+  const corner = normalizeInAppCorner(petPrefs.inAppCorner);
   const css = show
     ? `
       .dsh-pet-root, #dsh-pet-root {
@@ -1036,24 +1071,26 @@ function applyInAppPetVisibility() {
   } catch (err) {
     log(`applyInAppPetVisibility css failed: ${err.message}`);
   }
-  // Also patch inline style so React's default --dsh-pet-size:260px loses.
+  // Size + corner: sessionStorage is read by dsh-pet on mount (default left).
   if (show) {
     mainWindow.webContents
       .executeJavaScript(
         `(() => {
+          try { sessionStorage.setItem('dsh-inapp-pet-corner', ${JSON.stringify(corner)}); } catch (_) {}
           document.querySelectorAll('.dsh-pet-root, #dsh-pet-root').forEach((el) => {
             el.style.setProperty('--dsh-pet-size', '${size}px');
+            el.setAttribute('data-corner', ${JSON.stringify(corner)});
             const stage = el.querySelector('.dsh-pet-stage');
             if (stage) {
               stage.style.width = '${size}px';
               stage.style.height = '${size}px';
             }
           });
-          return ${size};
+          return ${JSON.stringify({ size, corner })};
         })();`,
         true,
       )
-      .then((r) => log(`inAppPet=show size=${r}`))
+      .then((r) => log(`inAppPet=show size=${r && r.size} corner=${r && r.corner}`))
       .catch((err) => log(`inAppPet size js failed: ${err.message}`));
   } else {
     log('inAppPet=hide');

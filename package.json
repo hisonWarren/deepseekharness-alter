@@ -1,6 +1,6 @@
 {
   "name": "deepseekharness-alter",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "private": false,
   "description": "Desktop shell alter for DeepSeek Harness - tray pet controls, UX polish, stable Windows boot",
   "author": "hisonWarren",
