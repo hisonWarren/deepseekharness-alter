@@ -1,24 +1,26 @@
 # Changelog
 
+## 0.2.2 — 2026-08-15
+
+### Fixed
+- App icon too small for electron-builder (`icon.png` now 1024×1024; was 180×180).
+
 ## 0.2.1 — 2026-08-15
 
 ### Fixed
-- Root `package.json` UTF-8 BOM broke electron-builder on CI (v0.2.0 Release failed on all platforms).
-- Sync latest desktop-shell `main.js` into the alter repo.
-- Ensure `dsh-ux-polish` registers `conversation.chat.node` `user`/`steering` at `priority: -10`.
+- Root `package.json` UTF-8 BOM broke electron-builder on CI.
+- Sync latest desktop-shell `main.js`.
+- `dsh-ux-polish` shadows `conversation.chat.node` at `priority: -10`.
 
 ### Notes
-- Sidebar **归档会话** still means hide-from-list, not permanent delete (upstream has no delete API).
+- Sidebar **归档会话** = hide from list, not permanent delete.
 
 ## 0.2.0 — 2026-08-15
 
 ### Added
-- **Inline user-message edit** (`dsh-ux-polish`): bubble becomes a textarea; submit forks/creates a session and re-prompts.
+- Inline user-message edit (`dsh-ux-polish`) with fork/branch semantics.
 - Docs: archive ≠ delete.
-
-### Fixed
-- Plugin load failure when shadowing chat node slots (priority shadowing).
 
 ## 0.1.0
 
-- Initial desktop shell alter: tray pets, network modes, stable boot, Windows icon, Release CI (win/mac/linux).
+- Initial desktop shell alter + Release CI (win/mac/linux).

@@ -56,8 +56,8 @@ npm start
 3. 打 tag 并推送：
 
 ```bash
-git tag v0.2.1
-git push origin v0.2.1
+git tag v0.2.2
+git push origin v0.2.2
 ```
 
 GitHub Actions [Release](.github/workflows/release.yml) 会构建 Win / macOS / Linux 并上传到 Releases。
