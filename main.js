@@ -7,29 +7,59 @@ const path = require('path');
 const fs = require('fs');
 const net = require('net');
 
-const DSH_ROOT = path.resolve(__dirname, '..');
 const APP_USER_MODEL_ID = 'com.deepseek.harness.desktop';
-const ICON_CANDIDATES = [
-  path.join(DSH_ROOT, 'deepseek.ico'),
-  path.join(__dirname, 'deepseek.ico'),
-  path.join(DSH_ROOT, 'deepseek-icon-180.png'),
-];
-const ICON_PATH = ICON_CANDIDATES.find((p) => fs.existsSync(p)) || ICON_CANDIDATES[0];
-const DSH_CMD = path.join(DSH_ROOT, 'dsh.cmd');
 
 // Windows taskbar groups by AppUserModelID; must match desktop shortcut.
 if (process.platform === 'win32') {
   app.setAppUserModelId(APP_USER_MODEL_ID);
 }
+
+// Writable state lives in userData (app.asar is read-only when packaged).
+try {
+  app.setPath('userData', path.join(app.getPath('appData'), 'DeepSeekHarnessDesktop'));
+} catch (_) {}
+const DATA_DIR = app.getPath('userData');
+try {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+} catch (_) {}
+
+/** Packaged: resources/dsh-runtime. Dev: ./dsh-runtime or sibling deepseek-harness. */
+function resolveDshRoot() {
+  if (app.isPackaged) {
+    return path.join(process.resourcesPath, 'dsh-runtime');
+  }
+  const candidates = [
+    path.join(__dirname, 'dsh-runtime'),
+    path.resolve(__dirname, '..', 'deepseek-harness'),
+    path.resolve(__dirname, '..'),
+  ];
+  for (const candidate of candidates) {
+    const bin = path.join(candidate, 'node_modules', '@deepseek-ai', 'dsh', 'lib', 'bin.js');
+    if (fs.existsSync(bin)) return candidate;
+  }
+  return path.join(__dirname, 'dsh-runtime');
+}
+
+const DSH_ROOT = resolveDshRoot();
+const ICON_CANDIDATES = [
+  path.join(__dirname, 'assets', 'deepseek.ico'),
+  path.join(__dirname, 'assets', 'icon.png'),
+  path.join(__dirname, 'deepseek.ico'),
+  path.join(DSH_ROOT, 'deepseek.ico'),
+  path.join(DSH_ROOT, 'deepseek-icon-180.png'),
+];
+const ICON_PATH = ICON_CANDIDATES.find((p) => fs.existsSync(p)) || ICON_CANDIDATES[0];
+const DSH_CMD = path.join(DSH_ROOT, 'dsh.cmd');
 const PET_HTML = path.join(__dirname, 'pet-desktop.html');
 const PET_PRELOAD = path.join(__dirname, 'pet-preload.js');
-const PET_PREFS_FILE = path.join(__dirname, 'pet-prefs.json');
-const NETWORK_PREFS_FILE = path.join(__dirname, 'network-prefs.json');
+const PET_PREFS_FILE = path.join(DATA_DIR, 'pet-prefs.json');
+const NETWORK_PREFS_FILE = path.join(DATA_DIR, 'network-prefs.json');
 const DEFAULT_PORT = 3080;
 const HOST = '127.0.0.1';
 const READY_TIMEOUT_MS = 90_000;
 const READY_POLL_MS = 400;
-const PID_FILE = path.join(__dirname, 'dsh-server.pid');
+const PID_FILE = path.join(DATA_DIR, 'dsh-server.pid');
+const LOG_FILE = path.join(DATA_DIR, 'desktop.log');
 const DEFAULT_PET_SIZE = { width: 280, height: 300 };
 const DEFAULT_CLASH_PORTS = [7897, 7890, 7891, 10809];
 
@@ -280,11 +310,6 @@ function applyPetSize(size) {
 petPrefs = loadPetPrefs();
 petEnabled = petPrefs.enabled !== false;
 
-// Stable userData so shortcut double-opens share one single-instance lock.
-try {
-  app.setPath('userData', path.join(app.getPath('appData'), 'DeepSeekHarnessDesktop'));
-} catch (_) {}
-
 const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {
   // CRITICAL: must not reach boot() — a second boot kills :3080 and freezes the first UI.
@@ -298,7 +323,7 @@ if (!gotLock) {
 function log(msg) {
   const line = `[dsh-desktop] ${new Date().toISOString()} ${msg}`;
   try {
-    fs.appendFileSync(path.join(__dirname, 'desktop.log'), line + '\n');
+    fs.appendFileSync(LOG_FILE, line + '\n');
   } catch (_) {}
   console.log(line);
 }
@@ -469,12 +494,21 @@ function startDsh(port) {
   return new Promise((resolve, reject) => {
     const dshBin = path.join(DSH_ROOT, 'node_modules', '@deepseek-ai', 'dsh', 'lib', 'bin.js');
     const nodeExe = resolveNodeExecutable();
-    const canDirect = fs.existsSync(dshBin) && (nodeExe !== 'node' || process.platform !== 'win32');
+    const canDirect = fs.existsSync(dshBin) && fs.existsSync(nodeExe);
+    if (!canDirect && !fs.existsSync(DSH_CMD)) {
+      reject(
+        new Error(
+          `dsh runtime missing.\nexpected: ${dshBin}\nDSH_ROOT=${DSH_ROOT}\npackaged=${app.isPackaged}`,
+        ),
+      );
+      return;
+    }
     const args = canDirect
       ? [dshBin, 'web', '--host', HOST, '--port', String(port)]
       : ['web', '--host', HOST, '--port', String(port)];
     const exe = canDirect ? nodeExe : DSH_CMD;
     log(`spawn: ${exe} ${args.join(' ')}`);
+    log(`DSH_ROOT=${DSH_ROOT} packaged=${app.isPackaged}`);
 
     const apiKey = readDeepSeekApiKey();
     const env = { ...process.env };
@@ -1077,7 +1111,7 @@ async function boot() {
     if (splashWindow && !splashWindow.isDestroyed()) splashWindow.close();
     dialog.showErrorBox(
       'DeepSeek Harness 启动失败',
-      `${err.message}\n\n若反复卡住：先完全退出托盘图标，再重新打开。\n详情见：${path.join(__dirname, 'desktop.log')}`,
+      `${err.message}\n\n若反复卡住：先完全退出托盘图标，再重新打开。\n详情见：${LOG_FILE}`,
     );
     killDshTree();
     app.quit();
