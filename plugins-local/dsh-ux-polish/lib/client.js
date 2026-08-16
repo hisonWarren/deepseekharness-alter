@@ -82,6 +82,20 @@ window.__ModuleLoader__.load({
 			"[data-dsh-auto-review-button]{border:0!important;background:transparent!important;min-height:28px!important;padding:3px 6px!important;gap:4px!important;border-radius:6px!important;font:inherit!important;font-size:12px!important;line-height:18px!important;color:var(--dsw-alias-label-tertiary,#81858c)!important}",
 			"[data-dsh-auto-review-button]:hover{color:var(--dsw-alias-label-secondary,#61666b)!important;background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12))!important}",
 			'body:has(.dsdr-overlay-docked) *:has(>[aria-label="展开侧边栏"]),body:has(.dsdr-overlay-docked) *:has(>[aria-label="收起侧边栏"]){visibility:hidden!important;pointer-events:none!important}',
+			/* Composer attach bridge (advisor E/D): paperclip + menu beside 命令 */
+			".dshUxAttach{position:relative;display:inline-flex;align-items:center;margin-left:2px}",
+			".dshUxAttachBtn{appearance:none;border:0;background:transparent;color:var(--dsw-alias-label-tertiary,#81858c);cursor:pointer;padding:4px;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;line-height:0}",
+			".dshUxAttachBtn:hover:not(:disabled){color:var(--dsw-alias-label-secondary,#61666b);background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12))}",
+			".dshUxAttachBtn:disabled{opacity:.4;cursor:default}",
+			".dshUxAttachBtn[aria-expanded=true]{color:var(--dsw-alias-label-primary,inherit);background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12))}",
+			".dshUxAttachMenu{position:absolute;left:0;bottom:calc(100% + 6px);z-index:12000;min-width:220px;padding:6px;border-radius:12px;border:1px solid var(--dsw-alias-border-l2,rgba(127,127,127,.28));background:var(--dsw-alias-bg-elevated,var(--dsw-alias-bg-primary,#fff));box-shadow:0 8px 24px rgba(0,0,0,.12)}",
+			".dshUxAttachItem{appearance:none;width:100%;display:flex;align-items:flex-start;gap:10px;text-align:left;border:0;background:transparent;border-radius:8px;padding:8px 10px;cursor:pointer;color:inherit;font:inherit}",
+			".dshUxAttachItem:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.1))}",
+			".dshUxAttachItemTitle{display:block;font-size:13px;font-weight:600;line-height:18px}",
+			".dshUxAttachItemDesc{display:block;font-size:12px;line-height:16px;color:var(--dsw-alias-label-caption,rgba(127,127,127,.75));margin-top:2px}",
+			".dshUxAttachHint{margin:4px 10px 2px;font-size:11px;line-height:15px;color:var(--dsw-alias-label-caption,rgba(127,127,127,.7))}",
+			".dshUxAttachErr{margin:4px 10px 6px;font-size:12px;line-height:16px;color:var(--dsw-alias-state-error-primary,#c44)}",
+			".dshUxAttachFile{display:none}",
 		].join("");
 
 		function IconCopy({ checked }) {
@@ -793,12 +807,210 @@ window.__ModuleLoader__.load({
 			});
 		}
 
+		function IconPaperclip() {
+			return jsx("svg", {
+				className: "dshUxIcon",
+				viewBox: "0 0 16 16",
+				fill: "none",
+				stroke: "currentColor",
+				strokeWidth: "1.5",
+				"aria-hidden": true,
+				children: jsx("path", {
+					d: "M5.5 8.5 9.2 4.8a2.3 2.3 0 1 1 3.25 3.25L7.2 13.3a3.5 3.5 0 0 1-4.95-4.95L8 2.6",
+					strokeLinecap: "round",
+					strokeLinejoin: "round",
+				}),
+			});
+		}
+
+		function ComposerAttachBridge(props) {
+			const sessions = props.__sessions;
+			const inputTriggersRoot = props.__inputTriggers;
+			const sessionId = props.sessionId;
+			const inputActions = props.inputActions;
+			const locked = Boolean(props.locked);
+			const input = props.input || props.useInput?.((s) => s);
+			const [open, setOpen] = react.useState(false);
+			const [error, setError] = react.useState("");
+			const rootRef = react.useRef(null);
+			const fileRef = react.useRef(null);
+
+			react.useEffect(() => {
+				if (!open) return;
+				const onDoc = (e) => {
+					if (rootRef.current && !rootRef.current.contains(e.target)) setOpen(false);
+				};
+				const onKey = (e) => {
+					if (e.key === "Escape") setOpen(false);
+				};
+				document.addEventListener("mousedown", onDoc);
+				document.addEventListener("keydown", onKey);
+				return () => {
+					document.removeEventListener("mousedown", onDoc);
+					document.removeEventListener("keydown", onKey);
+				};
+			}, [open]);
+
+			const busy = Boolean(input?.busy || input?.running);
+			const disabled = locked || !sessionId || !inputActions || busy;
+
+			const resolveConversation = () => {
+				try {
+					return sessions?.scope?.(sessionId)?.get?.("conversation");
+				} catch (_) {
+					return null;
+				}
+			};
+
+			const onPickImages = (files) => {
+				setError("");
+				const list = Array.from(files || []).filter(Boolean);
+				if (list.length === 0) return;
+				const conversation = resolveConversation();
+				if (!conversation?.createDraftImages) {
+					setError("当前会话无法添加图片。");
+					return;
+				}
+				try {
+					const images = conversation.createDraftImages(list);
+					const ids = images.map((img) => img.id);
+					if (!inputActions.addImages(ids)) {
+						conversation.releaseDraftImages?.(images);
+						setError("图片未加入草稿（可能超出数量或大小限制）。");
+						return;
+					}
+					setOpen(false);
+				} catch (err) {
+					setError(err && err.message ? String(err.message) : "添加图片失败");
+				}
+			};
+
+			const onOpenAtFile = () => {
+				setError("");
+				try {
+					const draft = String(input?.draft || "");
+					const needsAt = !/(^|\s)@$/.test(draft) && !draft.endsWith("@");
+					const nextDraft = needsAt ? (draft ? `${draft} @` : "@") : draft;
+					if (needsAt && inputActions?.setDraft) inputActions.setDraft(nextDraft);
+					const actx = sessions?.scope?.(sessionId);
+					const controller = inputTriggersRoot?.sessionOf?.(actx) || inputTriggersRoot;
+					const snapshotDraft = needsAt ? nextDraft : draft;
+					const start = Math.max(0, snapshotDraft.lastIndexOf("@"));
+					const end = snapshotDraft.length;
+					const draftRev = input?.draftRev;
+					if (controller?.toggleSource) {
+						controller.toggleSource("at-file", {
+							trigger: "@",
+							query: "",
+							position: snapshotDraft.trim() === "@" ? "leading" : "inline",
+							span: {
+								start,
+								end,
+								draftRev: typeof draftRev === "number" ? draftRev + (needsAt ? 1 : 0) : 0,
+							},
+						});
+					} else {
+						const ta = document.querySelector("[data-composer-card] textarea, textarea[placeholder]");
+						if (ta) {
+							ta.focus();
+							if (needsAt) {
+								const native = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value");
+								native?.set?.call(ta, nextDraft);
+								ta.dispatchEvent(new Event("input", { bubbles: true }));
+							}
+						}
+					}
+					setOpen(false);
+				} catch (err) {
+					setError(err && err.message ? String(err.message) : "无法打开 @ 文件");
+				}
+			};
+
+			return jsxs("div", {
+				className: "dshUxAttach",
+				ref: rootRef,
+				"data-dsh-ux-attach": "",
+				children: [
+					jsx("button", {
+						type: "button",
+						className: "dshUxAttachBtn",
+						"aria-label": "添加文件或图片",
+						title: "添加文件或图片",
+						"aria-haspopup": "menu",
+						"aria-expanded": open,
+						disabled,
+						onMouseDown: (e) => e.preventDefault(),
+						onClick: () => {
+							setError("");
+							setOpen((v) => !v);
+						},
+						children: jsx(IconPaperclip, {}),
+					}),
+					open
+						? jsxs("div", {
+								className: "dshUxAttachMenu",
+								role: "menu",
+								children: [
+									jsx("button", {
+										type: "button",
+										className: "dshUxAttachItem",
+										role: "menuitem",
+										onClick: () => fileRef.current?.click(),
+										children: jsxs("span", {
+											children: [
+												jsx("span", { className: "dshUxAttachItemTitle", children: "添加图片" }),
+												jsx("span", {
+													className: "dshUxAttachItemDesc",
+													children: "从本机选择图片，加入输入草稿",
+												}),
+											],
+										}),
+									}),
+									jsx("button", {
+										type: "button",
+										className: "dshUxAttachItem",
+										role: "menuitem",
+										onClick: onOpenAtFile,
+										children: jsxs("span", {
+											children: [
+												jsx("span", { className: "dshUxAttachItemTitle", children: "@ 工作区文件" }),
+												jsx("span", {
+													className: "dshUxAttachItemDesc",
+													children: "引用当前工作区路径（不上传内容）",
+												}),
+											],
+										}),
+									}),
+									jsx("div", {
+										className: "dshUxAttachHint",
+										children: "也可直接 Ctrl+V 粘贴图片，或把文件拖入窗口。",
+									}),
+									error ? jsx("div", { className: "dshUxAttachErr", children: error }) : null,
+									jsx("input", {
+										ref: fileRef,
+										className: "dshUxAttachFile",
+										type: "file",
+										accept: "image/*",
+										multiple: true,
+										onChange: (e) => {
+											onPickImages(e.target.files);
+											e.target.value = "";
+										},
+									}),
+								],
+							})
+						: null,
+				],
+			});
+		}
+
 		const name = "ux-polish";
-		const inject = ["slots", "sessions"];
+		const inject = ["slots", "sessions", "inputTriggers"];
 
 		function apply(ctx) {
 			ensureCss();
 			const sessions = ctx.get("sessions");
+			const inputTriggers = ctx.get("inputTriggers");
 
 			const UserView = react.memo(function UserView(props) {
 				return jsx(EditableUserMessage, { ...props, __sessions: sessions });
@@ -806,6 +1018,14 @@ window.__ModuleLoader__.load({
 
 			const QueueSendView = react.memo(function QueueSendView(props) {
 				return jsx(CursorQueueSend, { ...props, __sessions: sessions });
+			});
+
+			const AttachView = react.memo(function AttachView(props) {
+				return jsx(ComposerAttachBridge, {
+					...props,
+					__sessions: sessions,
+					__inputTriggers: inputTriggers,
+				});
 			});
 
 			// Shadow shipped user/steering renderers: same key + same priority throws;
@@ -878,6 +1098,19 @@ window.__ModuleLoader__.load({
 				ctx.slots.register(
 					{ name: "conversation.input.dock", id: "todo", order: 0, priority: -10 },
 					() => null,
+				),
+			);
+
+			// Advisor E/D: discoverable attach (picker + @file), keep 命令 slash-only.
+			ctx.slots.inject("conversation.input.left", () =>
+				ctx.slots.register(
+					{
+						name: "conversation.input.left",
+						id: "dsh-ux-attach",
+						order: 5,
+						label: "Attach",
+					},
+					AttachView,
 				),
 			);
 		}

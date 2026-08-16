@@ -1,7 +1,7 @@
 {
   "name": "dsh-ux-polish",
-  "version": "0.3.2",
-  "description": "Quieter chat chrome, inline user-message edit, Cursor-style queue, and composer chip alignment.",
+  "version": "0.3.3",
+  "description": "Quieter chat chrome, Cursor queue, composer chip align, and attach bridge (image picker + @file).",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
