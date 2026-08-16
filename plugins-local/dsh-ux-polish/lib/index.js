@@ -1,7 +1,7 @@
 ﻿/**
- * dsh-ux-polish host — inbox upload for arbitrary local files.
- * Browser cannot attach non-images into DSH's image-only draft rail, so we
- * copy bytes into `<cwd>/.dsh-inbox/` and the client inserts an @ path ref.
+ * dsh-ux-polish host — inbox upload for arbitrary local files / pasted screenshots.
+ * Clipboard images have no disk path; we copy bytes into `<cwd>/.dsh-inbox/`
+ * and the client inserts an @ path ref the agent can read.
  */
 import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
 import { basename, join, normalize, sep } from 'node:path';
@@ -14,13 +14,36 @@ const INBOX_DIR = '.dsh-inbox';
 /** Hard cap for one inbox copy (base64 expands ~4/3). */
 const MAX_BYTES = 32 * 1024 * 1024;
 
-function safeFileName(raw) {
+function mimeExt(mime) {
+  switch (String(mime || '').toLowerCase()) {
+    case 'image/jpeg':
+    case 'image/jpg':
+      return '.jpg';
+    case 'image/png':
+      return '.png';
+    case 'image/gif':
+      return '.gif';
+    case 'image/webp':
+      return '.webp';
+    case 'image/bmp':
+      return '.bmp';
+    default:
+      return String(mime || '').toLowerCase().startsWith('image/') ? '.png' : '';
+  }
+}
+
+function safeFileName(raw, mimeType) {
   const base = basename(String(raw || 'file').replace(/\\/g, '/'));
-  const cleaned = base
+  let cleaned = base
     .replace(/[^\w.\u4e00-\u9fff\- ()\[\]]+/g, '_')
     .replace(/^\.+/, '')
     .slice(0, 120);
-  return cleaned || 'file';
+  if (!cleaned) cleaned = 'file';
+  if (!/\.[A-Za-z0-9]{1,8}$/.test(cleaned)) {
+    const ext = mimeExt(mimeType);
+    if (ext) cleaned = `${cleaned}${ext}`;
+  }
+  return cleaned;
 }
 
 function uniquePath(dir, name) {
@@ -111,7 +134,7 @@ export function apply(ctx) {
             sendJson(res, 400, { ok: false, error: 'CWD_MISSING', message: '工作区目录不存在' });
             return;
           }
-          const name = safeFileName(body.name);
+          const name = safeFileName(body.name, body.mimeType);
           const b64 = String(body.dataBase64 || '');
           if (!b64) {
             sendJson(res, 400, { ok: false, error: 'EMPTY_BODY', message: '文件内容为空' });

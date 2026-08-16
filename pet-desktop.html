@@ -22,6 +22,12 @@
       /* Do NOT use -webkit-app-region:drag — video hit-target would break it. */
     }
     #stage.is-dragging { cursor: grabbing; }
+    /* Flip only the character sprite — never bubble/badge text. */
+    #sprite {
+      position: absolute;
+      inset: 0;
+      transform-origin: center;
+    }
     video {
       position: absolute;
       inset: 0;
@@ -50,6 +56,7 @@
       pointer-events: none;
       transition: opacity .2s ease;
       white-space: nowrap;
+      z-index: 2;
     }
     #bubble.show { opacity: 1; }
     #badge {
@@ -76,8 +83,10 @@
 <body>
   <div id="stage">
     <div id="bubble"></div>
-    <video id="a" muted playsinline></video>
-    <video id="b" muted playsinline></video>
+    <div id="sprite">
+      <video id="a" muted playsinline></video>
+      <video id="b" muted playsinline></video>
+    </div>
     <div id="badge"></div>
   </div>
   <script>
@@ -126,6 +135,7 @@
     ];
 
     const stage = document.getElementById('stage');
+    const sprite = document.getElementById('sprite');
     const va = document.getElementById('a');
     const vb = document.getElementById('b');
     const bubble = document.getElementById('bubble');
@@ -330,7 +340,8 @@
         if (name === '东张西望.webm') {
           playOnce(name).then(() => {
             facingRight = !facingRight;
-            stage.style.transform = facingRight ? 'scaleX(-1)' : '';
+            // Mirror character only; bubble/badge stay outside #sprite.
+            sprite.style.transform = facingRight ? 'scaleX(-1)' : '';
           });
         } else {
           playOnce(name);

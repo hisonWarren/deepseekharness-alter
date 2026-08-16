@@ -3,53 +3,39 @@
 [![Release](https://img.shields.io/github/v/release/hisonWarren/deepseekharness-alter?display_name=tag)](https://github.com/hisonWarren/deepseekharness-alter/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-面向 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 的桌面壳增强版（Electron）：
-
-- 稳定启动（端口回收、单实例、直连默认）
-- 托盘控制：应用内 / 外行宠显示与尺寸
-- UX 抛光：静音审批行 + 用户消息内联编辑并分支
-- **Cursor 式排队**：运行中可继续输入；有草稿时主按钮变为排队箭头（无旁路 Stop）；输入框上方显示 Queued 条；Shift+Enter 换行
-- 修复侧边栏打开 GitHub 等禁止嵌入站点时整页反复重载
-- 百炼生图 `dsh-dashscope-media`：工具成功可序列化 + 对话内联预览
-- 资源管理器自动刷新补丁 `dsh-explorer-auto-refresh`
-- Windows 任务栏 DeepSeek 图标
-
-仓库：[hisonWarren/deepseekharness-alter](https://github.com/hisonWarren/deepseekharness-alter)
+闂傚倸鐗勯崹褰掑箖?[DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 闂佹眹鍔岀€氼參銆侀幋锔筋棃闁靛繒濯寸槐锕€顭胯閸嬫稑顔忛柆宥嗗亱闁割偒鍓涚粈鍑焞ectron闂佹寧绋戦¨鈧紒?
+- 缂備礁顑呴崯鍧楁偩妤ｅ啫瑙︽い鏍ㄨ壘琚熼梺鎸庣☉閻楀繘顢旈鍕煑闁挎繂鎳忕粈鈧梺琛″亾闂婎剚绁撮崑鎾存媴缁嬭法顦伴柣搴℃贡閸嬫娆㈤妷鈺佄ュù锝囧劋缁绢垶寮堕埡鍐ㄤ槐缂侇噮鍨抽幏瀣Χ韫囨洜顦?- 闂佺懓鐏氶…鍥鸿箛娑樼鐟滃秹宕哄Δ鍛櫖婵﹩鍓涚€瑰鏌ｉ～顒€濡奸柛?/ 婵犮垼鍩栭悧鐐恒€侀幋鐘亾閸︻厼校婵☆垰顦辩划鍫熸姜閹殿喚鎲块柣蹇撶箰閹碱偊顢?- UX 闂佺鍩栫粙鎴﹀储濠婂牊鏅慨妯垮煐妤楊垶姊绘繝鍌氭毐妞ゆ挻鎮傞獮宥囨兜閸滀焦鏂€ + 闂佹椿娼块崝宥夊春濞戞ǚ妲堥柛顐ゅ枍缁辨牠鏌涢幇顒佸殌濞寸姴鐗忕槐鎾诲冀椤掑倸绔煎Δ鐘靛仩濞夋盯宕规惔銊ョ哗?- **Cursor 閻庢鍠栫换鎴犳暜閹剧粯鈷?*闂佹寧绋掓穱铏规崲瀹ュ洦鍋橀悘鐐跺閸橆剟鏌涘▎妯虹仯闁规挳顥撶槐鎺楊敇閿涘嫮鐐曢梺绋跨箞閸庤崵妲愰柆宥呭珘濠㈣泛楠哥壕鍝ョ磼鐎ｎ偄顕滄俊鐐插€圭粙澶岀磼濡櫣妯嗛梻浣虹摂閸犳牞銇愭径瀣枖闁绘垶锚缁楁捇姊婚崘顏勬灁妞ゆ柨瀚鍕綇閸撗咁槱闂佸搫鍟版慨闈涱潖閾忚宕?Stop闂佹寧绋戦¨鈧紒杈哺濞煎繘骞橀崘鎻掓辈濠碘剝顨呭Λ鏃傜箔閸岀偛妫橀悷娆忓閳绘梻绱掗埀?Queued 闂佸搫顦Σ鍕閻┾暏ift+Enter 闂佺懓绠嶉崹濂搞€?- 婵烇絽娴傞崰鏍囬崣澶岀懝鐟滄垹绮╅悢鐓庡唨闊洦鏌ㄩ埅鐢碘偓娈垮枓閸?GitHub 缂備焦绋戦ˇ閬嶃€呴敃鈧～銏ゅ閻樼偣鍋熼梺绋跨箞閸庢娊鎮甸鐐村€烽悷娆忓椤ρ囨煛娴ｈ灏﹂柕鍡楊樀瀹曪絽顓奸崪浣剐╅梻浣瑰絻缁夊嘲霉?- 闂佽皫鍐ㄢ挃闁稿瑪鍥ㄥ仺闁绘棃鏀辩粋?`dsh-dashscope-media`闂佹寧绋掗懝鐐閹版澘绀傞梺鍨儏閻忓洭鏌涢弮鍌氭瀻鐟滄澘寮堕幆鏃囩疀閹惧磭浠氶梺?+ 闁诲海鏁搁、濠囨儊娴犲绀冮柛娑㈩暒缁挸螞閺夊灝顏い?- 闁荤姍鍐仾缂侇煈鍠氱划濠氭晬閸曨剙鈧偤鏌涢敐鍐ㄥ闁搞倖绮撳畷婵嬪Ω閵夈儳鍘遍梺鍝勫€规刊鍊熸＂婵?`dsh-explorer-auto-refresh`
+- Windows 婵炲濮鹃褎鎱ㄩ悢鐓庡唨?DeepSeek 闂佹悶鍎抽崑鎾绘偉?
+婵炲濮甸幐鍝ヨ姳闁秵鏅慨婵囨敩isonWarren/deepseekharness-alter](https://github.com/hisonWarren/deepseekharness-alter)
 
 ---
 
-## 两种用法（选一）
-
-| 你的情况 | 怎么用 |
+## 婵炴垶鎸堕崐妤咃綖閹烘鍋ㄩ柕濠忓閵嗗﹪鏌ㄥ☉妯煎ⅵ闁逞屽墮椤︻喚绮╅幘顔芥櫖?
+| 婵炶揪绲挎慨宄扳枔閹达箑绠氶柛娑卞幖閺?| 闂佽鍓欑花鑲╃不閻愮儤鍋?|
 |----------|--------|
-| 想要完整桌面壳（托盘、行宠、网络偏好等） | 下 [Releases](https://github.com/hisonWarren/deepseekharness-alter/releases) 安装包 |
-| **已有官方 / 自建 DeepSeek Harness，只要 Cursor 排队 + UX 抛光** | 只装插件 `dsh-ux-polish`（见下方） |
+| 闂佽鍨伴悿鍥€呴敂閿亾閻熺増婀伴柡鍡到椤╃厧鐣濋崟顒併€冩繝銏犳贡椤掕尙妲愬▎鎾崇婵☆垰鍚嬬壕鎼佹煏閸℃洘绁版い銏″灩閳ь剙婀辨慨浼村焵椤戣儻鍏岀紓宥咁槺缁辨帒顭ㄩ崘褏鍓ㄦ繝闈涘€婚弲顐︽偤閹达附鏅?| 婵?[Releases](https://github.com/hisonWarren/deepseekharness-alter/releases) 闁诲海鎳撻ˇ鎶剿夋繝鍥х?|
+| **閻庡湱顭堝璺猴耿娴ｈ　鍋撶憴鍕嗘垿寮?/ 闂佺厧顨庢禍婊呯磽?DeepSeek Harness闂佹寧绋戦懟顖濄亹瑜忛幉?Cursor 闂佸湱鍎ょ敮鈥澄?+ UX 闂佺鍩栫粙鎴﹀储?* | 闂佸憡鐟禍锝壦夋繝鍥х闁瑰搫绉甸?`dsh-ux-polish`闂佹寧绋戦悧鎰帮綖閸℃鈻旈悗锝庡亝閻撴瑩鏌?|
 
 ---
 
-## 已有 DeepSeek Harness：只装插件
+## 閻庡湱顭堝璺猴耿?DeepSeek Harness闂佹寧绋掗懝鎹愩亹瑜忛幉妤呭川椤旇偐绁锋繛?
+闂佸湱绮敮濠傗枎閵忋倖鍎庢い鏃囧亹缁夊潡鏌ㄥ☉娆戞憰`plugins-local/dsh-ux-polish`](https://github.com/hisonWarren/deepseekharness-alter/tree/main/plugins-local/dsh-ux-polish)  
+闂佹寧绋戦悧鍡欌偓鍨耿瀹曟﹢宕ㄩ鐐叉婵犮垹婀辨晶妤€危?`dsh.bundle.patch`闂佹寧绋戦惉濂割敄娓氣偓瀹?[awesome-deepseek-harness](https://github.com/0xsline/awesome-deepseek-harness) / 闁诲氦顫夎摫闁哄瞼鍠栭幆?bundle 闁诲海鎳撻ˇ鎶剿夋繝鍕／闁挎洍鍋撻柣锝夌畺婵℃挳宕掗敂鍓ь槴
 
-插件目录：[`plugins-local/dsh-ux-polish`](https://github.com/hisonWarren/deepseekharness-alter/tree/main/plugins-local/dsh-ux-polish)  
-（包内已声明 `dsh.bundle.patch`，符合 [awesome-deepseek-harness](https://github.com/0xsline/awesome-deepseek-harness) / 官方的 bundle 安装约定。）
-
-社区常用装法（可直接照抄同类插件）：
-
-| 模式 | 代表 | 适合你时 |
+缂備讲鍋撻柟顖嗗啴娈柣銏╁灠閹芥粓寮妶鍥ㄥ晳闁告侗鍠氶妴濠囨煥濞戞澧曠憸鐗堢叀閹嫮鈧稒锚婢跺秹鏌ｉ幘妤€瀚穽闂佸憡鑹鹃惉鑲╂偖椤愶箑绠甸柟鍝勭У椤愪粙鏌ㄥ☉姗嗘缂?
+| 濠碘槅鍨埀顒€纾涵鈧?| 婵炲濯寸紞鈧柕?| 闂備緡鍋勯崐鎼佸箖鎼淬垺濯撮柣妯挎珪椤?|
 |------|------|----------|
-| `dsh plugin add "github:owner/repo#tag"` | [dsh-composer-polish](https://github.com/tianji-qingtian/dsh-composer-polish) | 仓库**根目录就是插件**（一行装） |
-| clone + `link:绝对路径` 写进 profile | [lbh1nb/dsh-plugins](https://github.com/lbh1nb/dsh-plugins)（含 steer-button） | **monorepo 子目录插件**（本仓库就是这种） |
-| 官方总说明 | [awesome Install](https://github.com/0xsline/awesome-deepseek-harness#install) | `dsh plugin` 转发 pnpm；装完需重启 |
+| `dsh plugin add "github:owner/repo#tag"` | [dsh-composer-polish](https://github.com/tianji-qingtian/dsh-composer-polish) | 婵炲濮甸幐鍝ヨ姳?*闂佸搫绉村﹢鍗灻洪幏灞讳汗闁哄洨鍋為惃鎴︽煛閸曢潧鐏＄憸鏉垮暞缁?*闂佹寧绋戦悧鍛博鐎靛憡鍋樼€光偓閸愮偓顥婇梺?|
+| clone + `link:缂傚倷鐒︾换鍌烆敋椤旂偓宕夋い鏍ㄦ皑缁愮€?闂佸憡鍔栭悷銊ф崲?profile | [lbh1nb/dsh-plugins](https://github.com/lbh1nb/dsh-plugins)闂佹寧绋戦悧鍡涘箚?steer-button闂?| **monorepo 闁诲孩绋掗崝妤€煤閹峰被浜归柡鍥╁枎缁茶霉?*闂佹寧绋戦悧濠傦耿閻楀牏顩烽柟鎯х－濮樸劑鎮樿箛姘跺摵婵℃彃鎲″璇测枎閹搭厽缍掗梺?|
+| 闁诲氦顫夎摫闁哄瞼鍠栭獮鈧柡鍕禋閸ゆ盯鏌?| [awesome Install](https://github.com/0xsline/awesome-deepseek-harness#install) | `dsh plugin` 闁哄鍎愰崜娆掋亹?pnpm闂佹寧绋掔粙鏍夋繝鍕ㄥ亾閻熸壆鐒告繛鎾崇埣閺屽苯顓奸崨顔煎壔 |
 
-> 注意：awesome 写明旧的「仓库子路径 / Repository Plugin」装法已不在官方主流流程里。本仓库根目录是 Electron 壳，**不能**对仓库根直接 `github:hisonWarren/deepseekharness-alter`，否则会装错包。请用下面的 **方法 A / B**。
-
-### 方法 A（推荐，monorepo 子包）：clone + `link:`（对齐 dsh-plugins）
-
+> 濠电偛顦崝宥夊礈娴煎瓨鏅慨婵囩·esome 闂佸憡鍔栭悷锕€危閹达箑绫嶇憸蹇撯枔閹达箑违閻忕偠鍋愬▔銏ゅ箹鐎涙ɑ灏柣鈩冪懅閹瑰嫰顢涘杈╃嵁 / Repository Plugin闂侀潧妫楃粔鐑剿夋繝鍌楁灃闁哄洨鍋涢崵鎺戔槈閹惧磭孝婵犫偓椤忓棌鍋撶憴鍕嗘垿寮婚悢鍝モ枖缂備焦顭囬妶锔界箾缂堢姾鍏岄柍璇层偢閺屽瞼浠﹂悜鈺佷壕闁稿本绋掗幏鍗灻归悩铏碍缂併劑浜跺浠嬪捶椤撶喓鐛ラ悷婊呭濞叉ê危?Electron 婵犮垹婀遍鑼?*婵炴垶鎸哥粔鐑藉礂?*闁诲海鏁婚埀顒佺〒濞夈垽骞栫€涙ɑ灏伴柣妤佹尦閹嫮鈧稒锚婢?`github:hisonWarren/deepseekharness-alter`闂佹寧绋戦懟顖炲箚娓氣偓瀹曟艾鈻庢惔锝囩崶闁荤喍绀侀幊姗€寮繝鍥х闁告侗鍋€閸嬫捇宕掑┑鎰闂佹椿娼块崝瀣箔閸涘瓨顥堥柕蹇嬪灪閻?**闂佸搫鍊介～澶屾兜?A / B**闂?
+### 闂佸搫鍊介～澶屾兜?A闂佹寧绋戦悧濠勬暜瑜版帗鍤掗柟鏉垮缁€濉祇norepo 闁诲孩绋掗崝鏇犫偓鍨耿閺佸秵寰勫☉姘辩崶clone + `link:`闂佹寧绋戦悧鍡涱敋椤旂瓔鐎?dsh-plugins闂?
 ```bash
 git clone --depth 1 https://github.com/hisonWarren/deepseekharness-alter.git
 ```
 
-编辑 `~/.dsh/profiles/web/package.json`（Windows：`%USERPROFILE%\.dsh\profiles\web\package.json`），加入依赖与 bundle（路径改成你的绝对路径，用正斜杠）：
-
+缂傚倸鍊归悧鐐垫?`~/.dsh/profiles/web/package.json`闂佹寧绋戝﹢绛皀dows闂佹寧绋掗悺?USERPROFILE%\.dsh\profiles\web\package.json`闂佹寧绋戦¨鈧紒杈ㄧ箞瀹曟繈鎮╅幓鎺戞辈婵炴挻纰嶇换鍡欑矉閸℃鈻?bundle闂佹寧绋戦悧鎰版儗閹屽殫闁告洦鍓氶弳顓㈡煙鐎涙ê濮冪紓宥嗭耿閹啴宕熼鐘插椽闁诲海鏁搁、濠囨儗閹屽殫闁告洖澧庣粈澶愭煟椤剙濡芥い鎺撶矒瀵剙顭ㄩ崟顒佺ギ闂佹寧绋戦¨鈧紒?
 ```json
 {
   "dependencies": {
@@ -65,17 +51,15 @@ git clone --depth 1 https://github.com/hisonWarren/deepseekharness-alter.git
 }
 ```
 
-然后在 profile 目录安装并重启：
-
+闂佺粯甯熷▔娑㈠箖濡ゅ懎鎹?profile 闂佺儵鏅╅崰鏍礊瀹ュ洠鍋撻悷閭︽Ъ妞ゃ儱锕悰顕€宕奸弴鐐搭仧闂佸憡鍑归崹鐣屾?
 ```bash
 cd ~/.dsh/profiles/web   # Windows: %USERPROFILE%\.dsh\profiles\web
-pnpm install             # 或: npx -y pnpm@11.21.0 install
-dsh --profile web        # 重启；运行中的实例不会热加载新 bundle
+pnpm install             # 闂? npx -y pnpm@11.21.0 install
+dsh --profile web        # 闂備焦褰冪粔鎾箚鎼淬劍鏅繛鎴炵矌缁犮儵鎮跺☉妯侯殭闁煎灚鍨块幆鍐礋椤愩倖婢栨繛鎾磋壘椤戝嫮绮径瀣嚤婵ê宕崝浼存煕閺冨倸鞋婵炴潙娲?bundle
 ```
 
-`link:` 指向源码目录时，以后 `git pull` 更新 alter 仓库再重启即可（比 `file:` 拷贝更不容易装到旧版）。
-
-### 方法 B：在插件目录里 `dsh plugin add .`
+`link:` 闂佸湱顭堝ú銈夊箖濠婂啠鏀﹂柟閭﹀枤閸ㄦ娊鏌ｉ埡濠傛灈缂傚秴绉瑰顔炬媼閸︻厾顦繛瀵稿О閸庨亶骞?`git pull` 闂佸搫娲ら悺銊╁蓟?alter 婵炲濮甸幐鍝ヨ姳闁秴绀冪€广儱顦▍銏ゆ煕濮樼厧鐏犵€规挸妫濆畷锝夘敍閵堝洨顦╁┑?`file:` 闂佸綊顥撻弻澶岀矆婢舵劕鍗崇紓鍫㈠Х閻熸繈鎮楃涵鍜佹綈婵″弶顨堥幉妤呭川椤撶偟鍘掗梺鍝勫敳閸涱収鏆梺鎸庣☉椤︻參鍩€?
+### 闂佸搫鍊介～澶屾兜?B闂佹寧绋掗懝鎯э耿椤忓牆绠甸柟鍝勭У椤愪粙鏌ｉ埡濠傛灈缂傚秴绉归弻?`dsh plugin add .`
 
 ```bash
 git clone --depth 1 https://github.com/hisonWarren/deepseekharness-alter.git
@@ -83,18 +67,15 @@ cd deepseekharness-alter/plugins-local/dsh-ux-polish
 dsh plugin --profile web add .
 ```
 
-（相对路径 `.` 会锚定到当前目录，与官方 CLI 行为一致。）
-
-需要全局 CLI 时：
-
+闂佹寧绋戦悧蹇撁规径灞稿亾閻㈡鏀伴柣顓熷劤椤?`.` 婵炴潙鍚嬪畝鎼佸极鐎ｎ兘鍋撶憴鍕闁糕晛鐭侀妵鎰板箻閸愬樊鏋€闂佺儵鏅╅崰鏍礊瀹ュ鏅悘鐐跺亹閻熴垽鎮楃憴鍕嗘垿寮?CLI 闁荤偞绋戞總鏃傛嫻閻斿摜鈻旈柍褜鍓熼幊娑樓庨钘変壕闁稿矉濡囩粈?
+闂傚倸娲犻崑鎾绘偡閺囨氨顦﹂柛娆忕箳娴狅箓鍩€?CLI 闂佸搫鍟抽鎰?
 ```bash
 npm install -g @deepseek-ai/dsh
-# 或: npx @deepseek-ai/dsh plugin --profile web add .
+# 闂? npx @deepseek-ai/dsh plugin --profile web add .
 ```
 
-### 方法 C：强制覆盖已安装的旧拷贝
-
-若以前用 `file:` 装过旧版，`node_modules` 里可能仍是一次性拷贝：
+### 闂佸搫鍊介～澶屾兜?C闂佹寧绋掗懝鎯ь啅闁秴绀嗛柟顖炲亰濞差剟鏌ｉ埡鍌滃ⅹ闁告埊绱曢埀顒傛嚀椤︽娊藟婵犲洦鍎嶉柛鏇ㄥ墯閿涘鏌熸搴㈢効缂佲偓?
+闂佸吋鐪归崕鐗堢閹烘绀堢€广儱娲﹂弳?`file:` 闁荤喍绀侀幊鎾舵崲閸愵喖绫嶇憸蹇旀櫠濡ゅ懏鏅悗鐟伴挒ode_modules` 闂備焦褰冮懟顖濄亹閺屻儲鍤勯柟瀛樺笧閻繈鏌￠崟闈涚仧缂佹梹娼欓埢搴ㄥ焺閸愶絽浜剧憸搴ｂ偓姘贡閹风懓鈹戦幘鍓佺崶
 
 ```powershell
 # Windows PowerShell
@@ -110,84 +91,55 @@ DST="$HOME/.dsh/profiles/web/node_modules/dsh-ux-polish"
 rm -rf "$DST" && cp -R "$SRC" "$DST"
 ```
 
-确认 `package.json` 的 `version` ≥ `0.3.0`，然后重启 `dsh web` 并硬刷新（Ctrl+Shift+R）。
-
-### 装好后怎么确认
-
-1. 设置 → Plugins 能看到 `dsh-ux-polish`
-2. 运行中再输入一段文字：应出现「加入排队」箭头（空草稿时仍是「停止」，这是预期）
-
-也可在应用内用社区的插件浏览器一键装其它插件（装法不同，但管理入口类似）：[dsh-find-plugin](https://github.com/topics/dsh-plugin) / [plugin-manager](https://github.com/0xsline/awesome-deepseek-harness) 等条目。
-
+缂佺虎鍙庨崰娑㈩敇?`package.json` 闂?`version` 闂?`0.3.0`闂佹寧绋戦惉濂稿礉瑜斿畷銉︽償閵娿儲顏熼梺?`dsh web` 濡ょ姷鍋涙晶搴ㄥ灳閺嶎厼绀嗛梺鍨儐閻撯偓闂佹寧绋戝﹢鎲坮l+Shift+R闂佹寧绋戦ˇ顓㈠焵?
+### 闁荤喍绀侀幊搴ㄥΧ娴犲瑙﹂幖绮规噰閸嬫挻鎯斿┑鍫㈡澖缂佺虎鍙庨崰娑㈩敇?
+1. 闁荤姳绀佹晶浠嬫偪?闂?Plugins 闂佺厧纾弲顐耿閸涙潙绀?`dsh-ux-polish`
+2. 闁哄鏅滈崝姗€銆侀幋鐐碘枖妞ゆ挾鍋涢弲娆撳级閸喐灏柛娆忔缁嬪鍩€椤掆偓閳绘捇宕归锝団偓顕€鎮楀☉娆樻缂佽京澧楅幆鏃堝棘閸喗鐦旈梺缁樼矎閸╁洭鍩€椤掆偓閼活垱鎱ㄩ悙鍝勭闁靛绠戠粭鎾绘⒒閸愵亜鏋傞柍褜鍓欑粔鍫曨敊閸曨剙绶為弶鍫濆⒔缁€鍕磼瀹€鍕窗鐎规洖绻掔划娆撳箰鎼淬埄妲繛瀵稿Т缁夐潧危閹间礁违閻忕偞鍨濈划缁樻叏濠垫劖濞囬柍褜鍓欑粙鍕濠靛洦浜ゆ繛鍡樺姈绗戞俊顐ｆ緲鐎氼厼锕㈤敓鐘虫櫖?
+婵炴垶姊婚崰搴ゃ亹閺屻儱鎹堕柕濞垮劤鐎瑰鏌ｉ～顒€濡奸柛鐐存尦閹粙濡歌娴狅箓鏌涢弽顒侇仩婵炲牊鍨块獮鎾诲箳瀹ュ棭鍋ㄥ┑鐐存綑缁绘锝炲澶婇棷闁靛鍊楅閬嶆⒑濞嗘儳鏋︽い銉ワ躬瀹曟鎹勯搹瑙勬疁闂佸湱绮敮濠傗枎閵忋倖鏅柛顐秵濡懏绻涙径瀣；缂佹顦靛畷銉ョ暆鐎ｎ剛顦繛杈剧到濡盯顢橀幖浣瑰仩闁糕剝顨呭鎶芥煕濞嗘瑧鎮奸悶姘煎亝鐎佃偐娑垫搴ｎ槴闂佹寧绋掗悺鐒弒h-find-plugin](https://github.com/topics/dsh-plugin) / [plugin-manager](https://github.com/0xsline/awesome-deepseek-harness) 缂備焦绋戦ˇ鏉款焽椤栫偞鍎庢い鏃囥€€閸?
 ---
 
-## 推荐搭配（经筛选，不是 awesome 全量）
-
-来源：[awesome-deepseek-harness](https://github.com/0xsline/awesome-deepseek-harness)。  
-原则：**互补日常任务 + 可安装产物（npm / 带 tag 的 github）+ 近期仍在维护**；与本仓库已带的排队 / UX / 费用条 / 皮肤 / 行宠等**不重复**。未达门槛的（低星、无发布、玩具向、同类堆叠）不写进推荐。
-
-### 建议现在就装（日常增益）
-
-| 插件 | 解决什么 | 安装 |
+## 闂佽浜介崝蹇撶暦濮椻偓楠炴牠顢橀姀鐘茶祴闂佹寧绋戦悧蹇曞垝閿涘嫮椹虫繛鎴旀噰閸嬫挻寰勫☉姘鳖槷婵炴垶鎸哥粔闈浳?awesome 闂佺绻堥崝鎴﹀闯濞差亝鏅?
+闂佸搫顦崕鑼姳椤曗偓閺佸秴顫㈤弨浜€esome-deepseek-harness](https://github.com/0xsline/awesome-deepseek-harness)闂? 
+闂佸憡顭囬崰搴ㄥ垂椤栫偞鏅?*婵炲瓨绮嶇敮鐔绘＂闂佸搫鍟ㄩ崕閬嶆偉閼哥數顩烽悹鍥ㄥ絻椤?+ 闂佸憡鐟崹浼存偩閵娧勫晳闁告侗鍓熼悰鎾绘煟濡炵粯娅旂紒杈ㄧ崲pm / 闁?tag 闂?github闂? 闁哄鏅滈崹璺猴耿閳╁啰顩风€广儱鎳忛煬顒傜磽娴ｅ摜鎽犲┑?*闂佹寧绋掔粙鎰箔瀹€鍕珘妞ゆ垼娉曞▔銏ゅ箹鐎涙ɑ灏柛鎴磿閺侇噣鏁傞悙顒傛殸闂佸湱鍎ょ敮鈥澄?/ UX / 闁荤姵鍔曞﹢閬嶅极閵堝绾?/ 闂佹椿鐓堥崰娑㈠磻?/ 闁荤偞绋戦懟顖炴偪閸モ晝椹?*婵炴垶鎸哥粔褰掑闯閸涘﹤绶?*闂侀潧妫楅崐鐟帮耿椤撶喐缍囧Δ锝呭暞閿涘本淇婇崣澶屻€掓繛鍫熷灴閺佸秹宕煎鍛ｉ梺鍝勫閸犲棝鍩€椤戣法鍔嶆俊顐犲€濆畷锝夊箣濠靛牜浼岄梺闈涙閼冲墎鏁ú顏勭鐎瑰嫮澧楅崐濠氭煏閸℃洜顦﹂柟顔芥尵閻氬墽鎷犻懠顒€鐏梺鍛婄懅婵妲愬顓犫枖鐎广儱鎳庨弲鎼佸级閳哄倻鈯曢悽顖氱秺閹筹繝骞囬埞鎯т壕?
+### 閻庣偣鍊濈紓姘额敊閸涘瓨鍋濋柡澶嬪闊剟鎮樿箛姘辩翱妞ゃ儱锕弫宥夊醇閻旈潻绱氶柣銏╁灣椤牓路閸愵喗鍎庡┑鐘茬箳缁€?
+| 闂佸湱绮敮濠傗枎?| 闁荤喐鐟辩徊浠嬪窗閸涱喚顩烽柍褜鍓氱粙?| 闁诲海鎳撻ˇ鎶剿?|
 |------|----------|------|
-| [dsh-auto-continue](https://github.com/HsiangNianian/dsh-auto-continue)（npm: `dsh-client-auto-continue`） | 非人为中断后自动排队发送「继续」；错误分类、退避、与 queue 兼容 | `dsh plugin --profile web add dsh-client-auto-continue` |
-| [dsh-composer-polish](https://github.com/tianji-qingtian/dsh-composer-polish) | 输入区 ✨ 润色草稿（flash 改写后写回，不直接发送） | `dsh plugin --profile web add "github:tianji-qingtian/dsh-composer-polish#v0.1.3"` |
+| [dsh-auto-continue](https://github.com/HsiangNianian/dsh-auto-continue)闂佹寧绋戝鐪昺: `dsh-client-auto-continue`闂?| 闂傚倸鐗忛崑妯盒ф径瀣枖閺夌偞濯介崢顒勬煛閸屻倕骞栭柟顔筋殜閹虫盯顢旈崟顐嶆鏌熼悜妯烘诞婵¤绠撳畷锝夊箣閿旂懓浜惧ù锝囶暯閸嬫挸鐣濋埀顒勫箣妞嬪海纾兼い鎾村閸嬫挸顓艰箛鏇炶€块梻浣瑰閻熴劑顢氶妶澶婄闁糕剝鐟ㄩ～锕傛煏閸℃洜绐旈柍褜鍏橀崑鎾绘⒑椤掑喛楠忛柍褜鍏涘鎺旂箔?queue 闂佺绻掗崢褔顢?| `dsh plugin --profile web add dsh-client-auto-continue` |
+| [dsh-composer-polish](https://github.com/tianji-qingtian/dsh-composer-polish) | 闁哄鐗婇幐鎼佸矗閸℃稑绀?闂?濠电偞鍩婄粻鎺撶珶婵犲洦鍤掑璺虹焾閻掗箖鏌ㄥ☉妯荤稈lash 闂佽　鍋撻柣鐔告緲閺呮悂鏌涘顒勵€楅柛鐔告崌瀹曞爼鎮滈崶鈺冾槷婵炴垶鎸哥粔璺好洪崸妤€绠抽柕澶堝劚缁叉椽姊洪锛勭瓘缂?| `dsh plugin --profile web add "github:tianji-qingtian/dsh-composer-polish#v0.1.3"` |
 
-装完后重启 `dsh --profile web`（或重启 Alter）。运行中的实例不会热加载新 bundle。
-
-### 优秀但按需（不要默认塞进日常）
-
-| 插件 | 何时装 | 注意 |
+闁荤喍绀侀幊搴ㄦ偩椤掑嫬瑙﹂幖娣妼濞呫垽鏌?`dsh --profile web`闂佹寧绋戦悧濠囧垂閵娾晜鐓傜€广儱鎳忛崕?Alter闂佹寧绋戦ˇ顓㈠焵椤掆偓閸婄晫鎹㈠鍥ㄥ仒閻忕偠澹堥崢顒勬煟閵娿儱顏╅柣銈呭缁楃喓鈧絺鏅濋悷婵喢归崗鍏肩殤闁稿骸缍婂畷婵嬫偐閻戞銈伴梺?bundle闂?
+### 婵炴潙鍚嬮…鍥綖閸涱喗濯撮柛鈩兠惁濠氭⒒閸ワ絽浜鹃梺鎸庣☉閻楀懐绮径灞惧暫濞撴埃鍋撶紒顕呭灣閹峰濡堕崪浣规殎闁哄鏅滅粙鎺懳涢埡鍐╂殰闂傚牃鏅濈粈?
+| 闂佸湱绮敮濠傗枎?| 婵炶揪绲惧ú妯侯渻閸屾粍鍟?| 濠电偛顦崝宥夊礈?|
 |------|--------|------|
-| [dsh-message-edit](https://github.com/Moeblack/dsh-message-edit) | 需要 Timeline / 分支重生成 / 助手块编辑时 | 与 `dsh-ux-polish` 的用户消息内联编辑可能叠 UI；二选一为主，或接受双入口 |
-| [dsh-chat-import](https://github.com/Nwflower/dsh-chat-import) | 从 Claude Code / Codex / Cursor 等导入历史会话时 | 迁移工具，不是常驻 Chrome；`dsh plugin --profile web add dsh-chat-import` |
+| [dsh-message-edit](https://github.com/Moeblack/dsh-message-edit) | 闂傚倸娲犻崑鎾绘偡?Timeline / 闂佸憡甯掑Λ娆撳极椤曗偓閺屽苯顓奸崶銊︽闂?/ 闂佸憡鏌￠弲婊勬櫠濠婂牆閿ゆ俊銈呭暟濡炰粙寮堕崼鐔风仸婵?| 婵?`dsh-ux-polish` 闂佹眹鍔岀€氼噣寮妶澶婄闂佸灝顑囧暩闂佽鍙庨崹浼村船閹绢喗鍤傞柡鍐ㄥ€诲浠嬪级閸喎鐏ョ憸鐗堢叀閹虫鎸婃径濠勭Ь UI闂佹寧绋掔粙鎰姳閳哄懏鐒诲璺侯槺椤忓崬鈽夐幘瑙勩€冮悗闈涚焸閺佸秶浠﹂幆褏浠愰梺瑙勪航閸庤精銇愰崼銉ョ煑閻忕偠妫勫鎶芥煕?|
+| [dsh-chat-import](https://github.com/Nwflower/dsh-chat-import) | 婵?Claude Code / Codex / Cursor 缂備焦绋戦ˇ顖烆敋闁秴绀傞柕澶堝劚閸у﹪鏌涘▎鎺戠处缂佽鲸澹嗛幏鐘测攽閸ヮ煈妲?| 闁哄鏅欓懗鏈电昂閻庤鎮堕崕閬嶅矗閸ф鏅悘鐐跺亹閻熸繈鏌￠崟闈涚仩闁绘牞鍩栭妵?Chrome闂佹寧绋掗惌鏉乻h plugin --profile web add dsh-chat-import` |
 
-### 明确不推荐为「Alter 默认搭配」
-
-- 其它桌面壳 / TUI（与 Alter 定位重叠）
-- 再装一套费用条 / 皮肤 / 行宠 / Spotlight 同类（profile 里已有）
-- 低信号 UX 插件（例如仅个位数 star、无 npm/tag、能力可被 at-file 或核心队列替代的）
-
+### 闂佸搫瀚ù鐑藉灳濡崵鈻旂€广儱妫楅懙褰掓煠閼恒儱濮冮悹鎰枛婵″鈧稑銆坱er 婵帗绋掗…鍫ヮ敇婵犳艾绠规い鎾卞灩鐢娊鏌?
+- 闂佺绻楀▔娑㈡偩閻樺樊娴栫€光偓閸曨剚銆冩繝?/ TUI闂佹寧绋戦悧鍛箔?Alter 闁诲氦顫夐惌顔剧礊閸涘瓨鐓傜€广儱鎳庣紞宀勬煥?- 闂佸憡鍔曠粔鐑剿夋繝鍐枖闁逞屽墯缁鸿棄螖閸曨偆鈧參鏌ｉ～顒€濡芥繛?/ 闂佹椿鐓堥崰娑㈠磻?/ 闁荤偞绋戦懟顖炴偪?/ Spotlight 闂佸憡鑹鹃惉鑲╂偖椤愶附鏅柛褜婀紀file 闂備焦褰冮懟顖炲礄閿熺姴瀚夊鑸电〒缁€?- 婵炶揪绲界花鍏肩┍婵犲洤鐭?UX 闂佸湱绮敮濠傗枎閵忋倖鏅柛顐ｇ矌娴兼劕鈹戦垾鍐测偓椋庡垝鎼淬垻鈻旀い蹇撳暟缁夋挳鏌?star闂侀潧妫旈悞锕€螞?npm/tag闂侀潧妫斿ù鍥礂濮椻偓瀹曟繂鈽夊Ο楦款唹闁?at-file 闂佺懓鐡ㄩ悧妤呮偋鐎圭姷鐤€闁告劦鍠楄闂佸憡甯楅〃鍡椕瑰☉娆戭浄闁挎繂娲﹂悾閬嶆煥?
 ---
 
-## 下载安装包（完整 Alter 桌面壳）
-
-从 [Releases](https://github.com/hisonWarren/deepseekharness-alter/releases) 下载对应平台安装包：
-
-| 平台 | 产物 |
+## 婵炴垶鎸搁鍫澝归崶鈹惧亾閻熼偊妲兼い銉ワ躬瀹曠娀宕崘顏嗩槱闁诲海鎳撻張顒勫汲?Alter 濠碘剝顨呴惌鍌氼焽閻楀牏鐝剁紒娑樻贡缁€?
+婵?[Releases](https://github.com/hisonWarren/deepseekharness-alter/releases) 婵炴垶鎸搁鍫澝归崶鈹惧亾閻㈠灚鍤€缂併劍鐓￠悰顕€宕橀幓鎺楀彙闁诲海鎳撻ˇ鎶剿夋繝鍥х闁告粌鍟扮粣?
+| 濡ょ姷鍋涢崯鑳亹?| 婵炲瓨绫傞崨顓涙寘 |
 |------|------|
 | Windows | `DeepSeekHarness-Alter-*-windows-x64.exe` |
 | macOS | `DeepSeekHarness-Alter-*-macos-*.dmg` |
 | Linux | `DeepSeekHarness-Alter-*-linux-x64.AppImage` |
 
-首次使用前请配置 DeepSeek API Key（与官方 dsh 相同，写入 `~/.dsh/.credentials.yaml`）。
-
-## 托盘菜单
-
-- **应用内行宠**：隐藏 / 显示；尺寸 160 / 200 / 260 / 320
-- **应用外行宠**：隐藏 / 显示；大小与位置
-- **网络**：强制直连（推荐）/ 自动 / 强制代理；可自定义代理地址与端口（如 7890 / 7897 / SOCKS5）
-
-## Cursor 式排队（dsh-ux-polish）
-
-| 状态 | 主控件 |
+婵☆偓绲鹃悧妤咁敃閸忓吋濯撮悹鎭掑妽閺嗗繘鏌涢幘宕囆ユい鏇ㄥ墴閺屽﹤顓奸崶鈺傜€?DeepSeek API Key闂佹寧绋戦悧鍛箔瀹€鈧埀顒冾潐钃遍柡?dsh 闂佺儵鏅濋…鍫ュ箖閹剧粯鏅悘鐐舵閺呮悂鏌?`~/.dsh/.credentials.yaml`闂佹寧绋戦ˇ顓㈠焵?
+## 闂佺懓鐏氶…鍥鸿箛娑欏殨婵犲﹤鍟粈?
+- **闁圭厧鐡ㄥ濠氬极閵堝绀冮柛娑㈠亰閺€浠嬫倵?*闂佹寧绋掑畝绋库枔閿濆瀵?/ 闂佸搫瀚晶浠嬪Φ濮樿埖鏅繛鎴炆戝Σ鈧柣?160 / 200 / 260 / 320
+- **闁圭厧鐡ㄥ濠氬极閵堝棗绶為柡宥庡墻閺€浠嬫倵?*闂佹寧绋掑畝绋库枔閿濆瀵?/ 闂佸搫瀚晶浠嬪Φ濮樿埖鏅繛鎴炃滄禍锝夋倶韫囨挾绠ｇ紒妤€鏈幏鍛吋閸モ晜鐎?- **缂傚倸鍟崹鍦垝?*闂佹寧绋掗懝鎯ь啅闁秴绀嗛柛鎾茬劍缁绢垶寮堕埡鍐ㄥ壋缂佽鲸鐟╅獮鎺楀Ω閵娿儳顦ㄩ梺? 闂佺厧顨庢禍婊勬叏?/ 閻庢鍠栭幖顐﹀春濡や胶顩烽柨婵嗘处閸婄偤鏌ㄥ☉娆戔槈鐟滅増鐓￠幊娑㈩敂閸曨厽姣庢繛鎴炴煥椤︻噣宕鍕仩闁糕剝顨嗛崟楣冩煕瑜夐崑鎾斥槈閹捐櫕鎹ｆい蹇ｅ墴瀹曪綁鏁愯箛鏇狀槱婵?7890 / 7897 / SOCKS5闂?
+## Cursor 閻庢鍠栫换鎴犳暜閹剧粯鈷撻柣鏇炲€荤粈鍒h-ux-polish闂?
+| 闂佺粯顭堥崺鏍焵?| 婵炴垶鎸剧划顖滄暜閼哥數顩?|
 |------|--------|
-| 空闲 | 发送 |
-| 运行中 + 输入框为空 | 停止 |
-| 运行中 + 有草稿 | **排队箭头**（清空草稿后主控件恢复为停止） |
+| 缂備礁鏈钘壩?| 闂佸憡鐟﹂崹鍧楀焵?|
+| 闁哄鏅滈崝姗€銆侀幋鐐碘枖?+ 闁哄鐗婇幐鎼佸矗閸℃娴栭柛鈩冩礉缁€瀣磼?| 闂佺顑嗙划宥夘敆?|
+| 闁哄鏅滈崝姗€銆侀幋鐐碘枖?+ 闂佸搫鐗嗛ˇ鍐茬暦韫囨洜鐭?| **闂佸湱鍎ょ敮鈥澄ｉ敂鍓т笉妞ゆ挾鍋戞禒?*闂佹寧绋戦悧濠勭博閼姐倗鐭氬Δ锕€鐏濈壕鍝ョ磼鐎ｎ亞浠㈤柟顔筋殕缁嬪绱掑Ο杞扮帛婵炲濮鹃崺鏍ㄧ椤旇棄绶炵€广儱瀚粈瀣煕鐎ｎ偆鐭嬫い鎺撶洴閺?|
 
-- Enter：运行中默认入队（核心 `busyEnter`）
-- Shift+Enter：换行
-- 输入框上方：**N Queued** 可折叠条（编辑 / 立即插话 steer / 删除）
-- 隐藏 Todo「预排任务」条，避免与 Queue 混淆
-
-## 说明
-
-- 本仓库包含：**Electron 桌面壳** + **可单独安装的 `dsh-ux-polish` 插件**。
-- 已有 DSH 部署时，不必换安装包，按上文「只装插件」即可。
-- 安装包体积较大属预期（内含 dsh 运行时）。
-- macOS / Windows 安装包默认未做代码签名。
-
+- Enter闂佹寧绋掓穱铏规崲瀹ュ洦鍋橀悘鐐跺閸橆剙顫楀☉娆樼劸妞ゆ挸顭峰畷妤呭Ψ閳哄倐鏇㈡煥濞戞澧涢柣妤€鐤囩粻?`busyEnter`闂?- Shift+Enter闂佹寧绋掔喊宥呯暦閼碱剚鍋?- 闁哄鐗婇幐鎼佸矗閸℃娴栭柛鈩冩礈閻熸劙鏌￠崒婊勵仧缂?*N Queued** 闂佸憡鐟崹杈ㄦ叏瀹€鍕煑闁绘娅曢拏瀣煥濞戞澧㈢紒槌栦簼濞?/ 缂備焦鏌ㄩ鍛暤閸℃稑绠甸柟鐑樻礈濡?steer / 闂佸憡甯炴繛鈧繛鍛叄閺?- 闂傚倸鎳忛崝妯何?Todo闂侀潧妫楅惌鍌炪€傞埡鍛闁瑰搫绉靛畷鏌ユ煕閺傚懏澹嬮崑鎾愁吋閸℃鎷梺鎸庣☉閻倹瀵奸埡鍛鐎广儱瀚悷?Queue 濠电儑缍侀弨杈╃矚?
+## 闁荤姴娲ら悺銊ノ?
+- 闂佸搫鐗滈崗娑氬垝閵婏附鍎熼柟鎯у暱閻﹀爼鏌涘鐓庝壕缂?*Electron 濠碘剝顨呴惌鍌氼焽閻楀牏鐝?* + **闂佸憡鐟崹鏉跨暦閻斿吋鍋戞い鎺嗗亾闁伙絻鍔庨幉妤呭川椤栨稓鏆?`dsh-ux-polish` 闂佸湱绮敮濠傗枎?*闂?- 閻庡湱顭堝璺猴耿?DSH 闂備緡鍠撻崝搴ｆ媼閺屻儱绫嶉悹浣告贡缁€澶娾槈閹惧磭孝缂佺儵鍋撻梺鐟扮畭閸ㄥ綊鎮鹃妸褎鍟戦柛娑卞幖閻﹀爼鏌ㄥ☉妯绘拱閻庡灚绮嶇粙澶嬬節閸愨晝鈧噣鏌曢崱妤勫鐟滄妸鍛晳闁告侗鍠栫徊璇裁归悩铏瑰牚闁逞屽墮缁夋潙鐣甸崱娑樼煑妞ゆ牗菤閸?- 闁诲海鎳撻ˇ鎶剿夋繝鍥х闁告侗鍓涚粔鑲╃磼婢舵ê鐏ョ紒鑸电箖瀵板嫯顦查柣顐Ｉ戦敍鎰板礋椤掍礁鐒搁梺鎸庣☉閻楀棝宕幘顔艰Е?dsh 闁哄鏅滈崝姗€銆侀幋锕€绫嶉悹浣告贡缁€鍡涙煏?- macOS / Windows 闁诲海鎳撻ˇ鎶剿夋繝鍥х闁告稑顕敮娑㈡偣娴ｉ潧鈧牕锕㈤銏犵；婵﹩鍋勯弫鈺呮煟椤旀槒鍏屾い鎺斿厴瀹曘儱顓奸崘锝呬壕?
 ## License
 
 MIT

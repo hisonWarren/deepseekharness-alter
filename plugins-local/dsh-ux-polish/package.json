@@ -1,7 +1,7 @@
 {
   "name": "dsh-ux-polish",
-  "version": "0.3.4",
-  "description": "Quieter chat chrome, Cursor queue, chip align, and attach bridge (any local file → image rail or .dsh-inbox @ref).",
+  "version": "0.3.6",
+  "description": "Quieter chat chrome, Cursor queue, attach→.dsh-inbox, docked 变动 sidebar reserve + soft frame.",
   "type": "module",
   "main": "lib/index.js",
   "exports": {

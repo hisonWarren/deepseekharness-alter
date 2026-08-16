@@ -82,6 +82,18 @@ window.__ModuleLoader__.load({
 			"[data-dsh-auto-review-button]{border:0!important;background:transparent!important;min-height:28px!important;padding:3px 6px!important;gap:4px!important;border-radius:6px!important;font:inherit!important;font-size:12px!important;line-height:18px!important;color:var(--dsw-alias-label-tertiary,#81858c)!important}",
 			"[data-dsh-auto-review-button]:hover{color:var(--dsw-alias-label-secondary,#61666b)!important;background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12))!important}",
 			'body:has(.dsdr-overlay-docked) *:has(>[aria-label="展开侧边栏"]),body:has(.dsdr-overlay-docked) *:has(>[aria-label="收起侧边栏"]){visibility:hidden!important;pointer-events:none!important}',
+			/* Docked 变动: leave room for better-sidebar; restore soft left chrome */
+			'html{--dsh-ux-sidebar-w:0px}',
+			'.dsdr-overlay{z-index:300!important}',
+			'.dsdr-overlay-docked{justify-content:flex-end!important;padding:0!important;padding-right:var(--dsh-ux-sidebar-w,0px)!important;box-sizing:border-box!important;background:transparent!important}',
+			'.dsdr-panel-docked{height:100vh!important;max-height:none!important;width:100%!important;max-width:none!important;border-radius:12px 0 0 12px!important;border:0!important;border-left:1px solid var(--dsw-alias-border-l2,rgba(127,127,127,.22))!important;box-shadow:-12px 0 40px rgba(0,0,0,.08)!important;overflow:hidden!important;background:var(--dsw-alias-bg-module-platform,var(--dsw-alias-bg-primary,#fff))!important}',
+			'.dsdr-panel-docked .dsdr-header{padding:10px 14px!important;border-bottom:1px solid var(--dsw-alias-border-l1,rgba(127,127,127,.14))!important;background:transparent!important}',
+			'.dsdr-panel-docked .dsdr-review-toolbar{min-height:40px!important;padding:6px 14px!important;background:var(--dsw-alias-bg-layer-1,rgba(127,127,127,.04))!important;border-bottom:1px solid var(--dsw-alias-border-l1,rgba(127,127,127,.14))!important}',
+			/* Tab chrome: peer-match session header (soft fill, no harsh outline) */
+			'.dsdr-tab{border:0!important;border-radius:8px!important;padding:4px 10px!important;min-height:28px!important}',
+			'.dsdr-tab-active{border:0!important;background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12))!important;color:var(--dsw-alias-label-primary,inherit)!important;font-weight:600!important}',
+			'.dsdr-new-tab-btn{border:0!important;border-radius:8px!important}',
+			'.dsdr-diff-path{padding:8px 14px!important;margin:0!important;background:var(--dsw-alias-bg-layer-1,rgba(127,127,127,.03))!important;border-bottom:1px solid var(--dsw-alias-border-l1,rgba(127,127,127,.12))!important}',
 			/* Composer attach bridge (advisor E/D): paperclip + menu beside 命令 */
 			".dshUxAttach{position:relative;display:inline-flex;align-items:center;margin-left:2px}",
 			".dshUxAttachBtn{appearance:none;border:0;background:transparent;color:var(--dsw-alias-label-tertiary,#81858c);cursor:pointer;padding:4px;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;line-height:0}",
@@ -96,6 +108,9 @@ window.__ModuleLoader__.load({
 			".dshUxAttachHint{margin:4px 10px 2px;font-size:11px;line-height:15px;color:var(--dsw-alias-label-caption,rgba(127,127,127,.7))}",
 			".dshUxAttachErr{margin:4px 10px 6px;font-size:12px;line-height:16px;color:var(--dsw-alias-state-error-primary,#c44)}",
 			".dshUxAttachFile{display:none}",
+			/* dsh-balance-meter details: package falls back to #1f1f1f while light UI inherits dark text */
+			'.gdQcsW_details{background:var(--dsw-alias-bg-elevated,var(--dsw-alias-bg-primary,#fff))!important;color:var(--dsw-alias-label-primary,#1d1d1f)!important;border-color:var(--dsw-alias-border-l2,rgba(127,127,127,.28))!important;box-shadow:0 4px 16px rgba(0,0,0,.12)!important}',
+			'.gdQcsW_details .gdQcsW_sep,.gdQcsW_details .gdQcsW_cost{opacity:.75;color:inherit}',
 		].join("");
 
 		function IconCopy({ checked }) {
@@ -226,12 +241,14 @@ window.__ModuleLoader__.load({
 
 		function ensureCss() {
 			if (typeof document === "undefined") return;
-			if (document.querySelector('style[data-plugin-css="' + CSS_ID + '"]')) return;
-			const tag = document.createElement("style");
-			tag.dataset.plugin = "dsh-ux-polish";
-			tag.dataset.pluginCss = CSS_ID;
+			let tag = document.querySelector('style[data-plugin-css="' + CSS_ID + '"]');
+			if (!tag) {
+				tag = document.createElement("style");
+				tag.dataset.plugin = "dsh-ux-polish";
+				tag.dataset.pluginCss = CSS_ID;
+				document.head.appendChild(tag);
+			}
 			tag.textContent = css;
-			document.head.appendChild(tag);
 		}
 
 		function contentText(content) {
@@ -823,6 +840,102 @@ window.__ModuleLoader__.load({
 			});
 		}
 
+		function mimeToExt(mime) {
+			switch (String(mime || "").toLowerCase()) {
+				case "image/jpeg":
+				case "image/jpg":
+					return ".jpg";
+				case "image/png":
+					return ".png";
+				case "image/gif":
+					return ".gif";
+				case "image/webp":
+					return ".webp";
+				case "image/bmp":
+					return ".bmp";
+				default:
+					return "";
+			}
+		}
+
+		/** Clipboard screenshots often have empty / generic names and no disk path. */
+		function inboxFileName(file, kind) {
+			const raw = String(file?.name || "").trim();
+			const extFromMime = mimeToExt(file?.type);
+			if (raw && raw !== "image.png" && raw !== "image.jpg" && /\.[A-Za-z0-9]{1,8}$/.test(raw)) {
+				return raw;
+			}
+			if (raw && /\.[A-Za-z0-9]{1,8}$/.test(raw)) return raw;
+			const stamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+			const stem = kind === "paste" ? `screenshot-${stamp}` : raw || `file-${stamp}`;
+			return `${stem}${extFromMime || (kind === "paste" ? ".png" : "")}`;
+		}
+
+		function fileToBase64(file) {
+			return new Promise((resolve, reject) => {
+				const reader = new FileReader();
+				reader.onload = () => {
+					const result = String(reader.result || "");
+					const comma = result.indexOf(",");
+					resolve(comma >= 0 ? result.slice(comma + 1) : result);
+				};
+				reader.onerror = () => reject(reader.error || new Error("read failed"));
+				reader.readAsDataURL(file);
+			});
+		}
+
+		function imageFilesFromDataTransfer(data) {
+			if (!data) return [];
+			const fromItems = Array.from(data.items || [])
+				.filter((item) => item.kind === "file")
+				.map((item) => item.getAsFile())
+				.filter(Boolean);
+			const candidates = fromItems.length > 0 ? fromItems : Array.from(data.files || []);
+			return candidates.filter((file) => String(file.type || "").toLowerCase().startsWith("image/"));
+		}
+
+		function resolveSessionCwd(sessions, sessionId) {
+			try {
+				return sessions?.list?.getSnapshot?.()?.byId?.[sessionId]?.cwd || "";
+			} catch (_) {
+				return "";
+			}
+		}
+
+		async function uploadFilesToInbox(files, { cwd, setDraft, getDraft, kind }) {
+			if (!cwd) throw new Error("请先选择工作区，才能添加文件（含截图）。");
+			const list = Array.from(files || []).filter(Boolean);
+			if (list.length === 0) return [];
+			const paths = [];
+			for (const file of list) {
+				const dataBase64 = await fileToBase64(file);
+				const res = await fetch("/ux-polish/inbox", {
+					method: "POST",
+					headers: { "content-type": "application/json" },
+					body: JSON.stringify({
+						cwd,
+						name: inboxFileName(file, kind),
+						mimeType: file.type || "",
+						dataBase64,
+					}),
+				});
+				const body = await res.json().catch(() => ({}));
+				if (!res.ok || !body?.ok || !body.relativePath) {
+					throw new Error(body?.message || `上传失败（${res.status}）`);
+				}
+				paths.push(body.relativePath);
+			}
+			if (typeof setDraft === "function") {
+				let draft = String(typeof getDraft === "function" ? getDraft() : "");
+				for (const relativePath of paths) {
+					const token = `@${String(relativePath).replace(/\\/g, "/")}`;
+					draft = draft ? `${draft.replace(/\s+$/, "")} ${token}` : token;
+				}
+				setDraft(draft);
+			}
+			return paths;
+		}
+
 		function ComposerAttachBridge(props) {
 			const sessions = props.__sessions;
 			const inputTriggersRoot = props.__inputTriggers;
@@ -854,83 +967,24 @@ window.__ModuleLoader__.load({
 			const busy = Boolean(input?.busy || input?.running);
 			const disabled = locked || !sessionId || !inputActions || busy;
 			const cwd =
-				sessions?.list?.getSnapshot?.()?.byId?.[sessionId]?.cwd ||
+				resolveSessionCwd(sessions, sessionId) ||
 				props.session?.cwd ||
 				"";
-
-			const resolveConversation = () => {
-				try {
-					return sessions?.scope?.(sessionId)?.get?.("conversation");
-				} catch (_) {
-					return null;
-				}
-			};
-
-			const fileToBase64 = (file) =>
-				new Promise((resolve, reject) => {
-					const reader = new FileReader();
-					reader.onload = () => {
-						const result = String(reader.result || "");
-						const comma = result.indexOf(",");
-						resolve(comma >= 0 ? result.slice(comma + 1) : result);
-					};
-					reader.onerror = () => reject(reader.error || new Error("read failed"));
-					reader.readAsDataURL(file);
-				});
-
-			const appendAtPath = (relativePath) => {
-				const token = `@${String(relativePath).replace(/\\/g, "/")}`;
-				const draft = String(input?.draft || "");
-				const next = draft ? `${draft.replace(/\s+$/, "")} ${token}` : token;
-				inputActions.setDraft?.(next);
-			};
-
-			const ingestImages = (list) => {
-				const conversation = resolveConversation();
-				if (!conversation?.createDraftImages) {
-					throw new Error("当前会话无法添加图片。");
-				}
-				const images = conversation.createDraftImages(list);
-				const ids = images.map((img) => img.id);
-				if (!inputActions.addImages(ids)) {
-					conversation.releaseDraftImages?.(images);
-					throw new Error("图片未加入草稿（可能超出数量或大小限制）。");
-				}
-			};
-
-			const ingestOtherFiles = async (list) => {
-				if (!cwd) throw new Error("请先选择工作区，才能添加非图片文件。");
-				const paths = [];
-				for (const file of list) {
-					const dataBase64 = await fileToBase64(file);
-					const res = await fetch("/ux-polish/inbox", {
-						method: "POST",
-						headers: { "content-type": "application/json" },
-						body: JSON.stringify({
-							cwd,
-							name: file.name || "file",
-							dataBase64,
-						}),
-					});
-					const body = await res.json().catch(() => ({}));
-					if (!res.ok || !body?.ok || !body.relativePath) {
-						throw new Error(body?.message || `上传失败（${res.status}）`);
-					}
-					paths.push(body.relativePath);
-				}
-				for (const p of paths) appendAtPath(p);
-				return paths;
-			};
 
 			const onPickFiles = async (files) => {
 				setError("");
 				const list = Array.from(files || []).filter(Boolean);
 				if (list.length === 0) return;
-				const images = list.filter((f) => String(f.type || "").startsWith("image/"));
-				const others = list.filter((f) => !String(f.type || "").startsWith("image/"));
 				try {
-					if (images.length) ingestImages(images);
-					if (others.length) await ingestOtherFiles(others);
+					// Always materialize into workspace .dsh-inbox + @path.
+					// Clipboard / OS screenshots have no disk path; draft-image rail
+					// also leaves text-only models without a readable path.
+					await uploadFilesToInbox(list, {
+						cwd,
+						kind: "pick",
+						getDraft: () => String(input?.draft || ""),
+						setDraft: (next) => inputActions?.setDraft?.(next),
+					});
 					setOpen(false);
 				} catch (err) {
 					setError(err && err.message ? String(err.message) : "添加文件失败");
@@ -1013,7 +1067,7 @@ window.__ModuleLoader__.load({
 												jsx("span", { className: "dshUxAttachItemTitle", children: "添加文件" }),
 												jsx("span", {
 													className: "dshUxAttachItemDesc",
-													children: "任意本地文件：图片进草稿预览，其它复制到工作区 .dsh-inbox 并 @ 引用",
+													children: "复制到工作区 .dsh-inbox 并 @ 引用（含截图；无磁盘路径也能发送）",
 												}),
 											],
 										}),
@@ -1035,7 +1089,7 @@ window.__ModuleLoader__.load({
 									}),
 									jsx("div", {
 										className: "dshUxAttachHint",
-										children: "图片也可 Ctrl+V / 拖入。非图片单文件上限约 32MB。",
+										children: "Ctrl+V / 拖入截图也会写入 .dsh-inbox。单文件约 32MB。",
 									}),
 									error ? jsx("div", { className: "dshUxAttachErr", children: error }) : null,
 									jsx("input", {
@@ -1063,6 +1117,127 @@ window.__ModuleLoader__.load({
 			ensureCss();
 			const sessions = ctx.get("sessions");
 			const inputTriggers = ctx.get("inputTriggers");
+
+			// Capture on window (before document listeners from modlens / vision-toolkit).
+			// Modlens paste-to-path writes OS temp outside cwd → agent "找不到路径".
+			ctx.effect(() => {
+				let inflight = false;
+				const notify = (level, text) => {
+					try {
+						const sid = sessions?.list?.getSnapshot?.()?.current;
+						if (!sid) return;
+						const actx = sessions.scope?.(sid);
+						actx?.get?.("conversation")?.input?.for?.(actx)?.notify?.(level, text);
+					} catch (_) {}
+				};
+				const inComposer = (target) =>
+					target instanceof HTMLTextAreaElement && target.closest("[data-composer-card]");
+				const runInbox = async (files, kind) => {
+					if (inflight) return;
+					const sid = sessions?.list?.getSnapshot?.()?.current;
+					if (!sid) {
+						notify("error", "请先打开会话再粘贴截图");
+						return;
+					}
+					const actx = sessions.scope?.(sid);
+					const input = actx?.get?.("conversation")?.input?.for?.(actx);
+					if (!input?.setDraft) {
+						notify("error", "当前会话无法写入草稿");
+						return;
+					}
+					const cwd = resolveSessionCwd(sessions, sid);
+					inflight = true;
+					try {
+						await uploadFilesToInbox(files, {
+							cwd,
+							kind,
+							getDraft: () => String(input.state?.getSnapshot?.()?.draft ?? ""),
+							setDraft: (next) => input.setDraft(next),
+						});
+						notify("info", kind === "paste" ? "截图已保存到 .dsh-inbox" : "图片已保存到 .dsh-inbox");
+					} catch (err) {
+						notify("error", err && err.message ? String(err.message) : "保存截图失败");
+					} finally {
+						inflight = false;
+					}
+				};
+				const onPaste = (event) => {
+					const files = imageFilesFromDataTransfer(event.clipboardData);
+					if (files.length === 0) return;
+					if (!inComposer(event.target)) return;
+					event.preventDefault();
+					event.stopImmediatePropagation();
+					void runInbox(files, "paste");
+				};
+				const onDragOver = (event) => {
+					if (!imageFilesFromDataTransfer(event.dataTransfer).length) return;
+					if (!event.target?.closest?.("[data-composer-card]")) return;
+					event.preventDefault();
+					event.dataTransfer.dropEffect = "copy";
+				};
+				const onDrop = (event) => {
+					const files = imageFilesFromDataTransfer(event.dataTransfer);
+					if (files.length === 0) return;
+					if (!event.target?.closest?.("[data-composer-card]")) return;
+					event.preventDefault();
+					event.stopImmediatePropagation();
+					void runInbox(files, "drop");
+				};
+				// window capture runs before document capture (modlens / vision-toolkit).
+				window.addEventListener("paste", onPaste, true);
+				window.addEventListener("dragover", onDragOver, true);
+				window.addEventListener("drop", onDrop, true);
+				return () => {
+					window.removeEventListener("paste", onPaste, true);
+					window.removeEventListener("dragover", onDragOver, true);
+					window.removeEventListener("drop", onDrop, true);
+				};
+			}, "dsh-ux-polish: paste/drop → .dsh-inbox");
+
+			// Docked 变动 vs better-sidebar: measure open panel width → CSS var.
+			ctx.effect(() => {
+				const root = document.documentElement;
+				let raf = 0;
+				const measure = () => {
+					raf = 0;
+					const docked = document.querySelector(".dsdr-overlay-docked");
+					if (!docked) {
+						root.style.setProperty("--dsh-ux-sidebar-w", "0px");
+						return;
+					}
+					const panel = document.querySelector(".W-zNGW_panel:not(.W-zNGW_panelHidden)");
+					let w = 0;
+					if (panel) {
+						const rect = panel.getBoundingClientRect();
+						// Only count a right-docked sidebar; cap so 变动 keeps usable width.
+						const looksRightDocked = rect.width > 40 && rect.right >= window.innerWidth - 12;
+						if (looksRightDocked) {
+							const cap = Math.min(520, Math.floor(window.innerWidth * 0.42));
+							w = Math.min(Math.round(rect.width), cap);
+						}
+					}
+					root.style.setProperty("--dsh-ux-sidebar-w", `${w}px`);
+				};
+				const schedule = () => {
+					if (raf) return;
+					raf = requestAnimationFrame(measure);
+				};
+				schedule();
+				const mo = new MutationObserver(schedule);
+				mo.observe(document.body, {
+					subtree: true,
+					childList: true,
+					attributes: true,
+					attributeFilter: ["class", "style"],
+				});
+				window.addEventListener("resize", schedule);
+				return () => {
+					mo.disconnect();
+					window.removeEventListener("resize", schedule);
+					if (raf) cancelAnimationFrame(raf);
+					root.style.setProperty("--dsh-ux-sidebar-w", "0px");
+				};
+			}, "dsh-ux-polish: docked-review sidebar reserve");
 
 			const UserView = react.memo(function UserView(props) {
 				return jsx(EditableUserMessage, { ...props, __sessions: sessions });
