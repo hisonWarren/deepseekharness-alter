@@ -586,6 +586,53 @@ function resolveNodeExecutable() {
   return 'node';
 }
 
+/**
+ * npm `file:` deps are copied once into ~/.dsh/profiles/web/node_modules.
+ * Force-sync bundled plugins-local on every boot so Alter updates actually load.
+ */
+function syncBundledPlugins() {
+  const localRoot = path.join(__dirname, 'plugins-local');
+  if (!fs.existsSync(localRoot)) {
+    log('syncPlugins: no plugins-local');
+    return;
+  }
+  const home = process.env.USERPROFILE || process.env.HOME || '';
+  const profileNm = path.join(home, '.dsh', 'profiles', 'web', 'node_modules');
+  if (!fs.existsSync(profileNm)) {
+    log(`syncPlugins: missing ${profileNm}`);
+    return;
+  }
+  let names;
+  try {
+    names = fs.readdirSync(localRoot);
+  } catch (err) {
+    log(`syncPlugins: read failed ${err.message}`);
+    return;
+  }
+  for (const name of names) {
+    const src = path.join(localRoot, name);
+    let st;
+    try {
+      st = fs.statSync(src);
+    } catch (_) {
+      continue;
+    }
+    if (!st.isDirectory()) continue;
+    if (!fs.existsSync(path.join(src, 'package.json'))) continue;
+    const dst = path.join(profileNm, name);
+    try {
+      fs.cpSync(src, dst, { recursive: true, force: true });
+      let ver = '?';
+      try {
+        ver = JSON.parse(fs.readFileSync(path.join(dst, 'package.json'), 'utf8')).version || '?';
+      } catch (_) {}
+      log(`syncPlugins: ${name}@${ver} -> ${dst}`);
+    } catch (err) {
+      log(`syncPlugins failed ${name}: ${err.message}`);
+    }
+  }
+}
+
 function startDsh(port) {
   return new Promise((resolve, reject) => {
     const dshBin = path.join(DSH_ROOT, 'node_modules', '@deepseek-ai', 'dsh', 'lib', 'bin.js');
@@ -1210,6 +1257,7 @@ function createWindow(url) {
 
 async function boot() {
   cleanupStaleServer();
+  syncBundledPlugins();
   await waitUntilPortFree(DEFAULT_PORT, 6000);
   createSplash();
   try {

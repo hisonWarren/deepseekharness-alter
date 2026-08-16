@@ -312,10 +312,20 @@ window.__ModuleLoader__.load({
 		function CursorQueueSend(props) {
 			const sessions = props.__sessions;
 			const { useSession, useInput, inputActions, sessionId } = props;
-			const running = useSession ? useSession((s) => s.running) : false;
-			const subagent = useSession ? useSession((s) => s.subagent) : null;
-			const draft = useInput ? useInput((s) => s.draft) : "";
-			const phase = useInput ? useInput((s) => s.phase) : "idle";
+			// InputZone owner share is point-in-time snapshots (preferred).
+			// Standard hooks are also present on some builds — use both.
+			const snapRunning = props.session?.running;
+			const snapSubagent = props.session?.subagent;
+			const snapDraft = props.input?.draft;
+			const snapPhase = props.input?.phase;
+			const hookRunning = useSession ? useSession((s) => s.running) : undefined;
+			const hookSubagent = useSession ? useSession((s) => s.subagent) : undefined;
+			const hookDraft = useInput ? useInput((s) => s.draft) : undefined;
+			const hookPhase = useInput ? useInput((s) => s.phase) : undefined;
+			const running = snapRunning ?? hookRunning ?? false;
+			const subagent = snapSubagent !== undefined ? snapSubagent : hookSubagent ?? null;
+			const draft = snapDraft ?? hookDraft ?? "";
+			const phase = snapPhase ?? hookPhase ?? "idle";
 			const machineBusy = phase === "adjudicating" || phase === "submitting";
 			const empty = !String(draft ?? "").trim();
 			const queueMode = Boolean(running && subagent === null && !empty && !machineBusy);
@@ -328,9 +338,19 @@ window.__ModuleLoader__.load({
 				};
 			}, [queueMode]);
 
-			const onQueue = () => {
-				if (!inputActions?.submit || empty || machineBusy) return;
-				inputActions.submit();
+			const onQueue = async () => {
+				if (empty || machineBusy) return;
+				if (inputActions?.submit) {
+					inputActions.submit();
+					return;
+				}
+				const session = sessions?.binding?.(sessionId)?.session;
+				const text = String(draft ?? "").trim();
+				if (!session?.prompt || !text) return;
+				try {
+					await session.prompt([{ type: "text", text }], "queue");
+					inputActions?.setDraft?.("");
+				} catch (_) {}
 			};
 
 			const onStop = () => {
@@ -367,7 +387,7 @@ window.__ModuleLoader__.load({
 						"data-dsh-ux-ctrl": "queue",
 						title: "加入排队（当前回合结束后发送）",
 						"aria-label": "加入排队",
-						disabled: machineBusy || !inputActions?.submit,
+						disabled: machineBusy,
 						onMouseDown: keepFocus,
 						onClick: onQueue,
 						children: jsx(IconQueueArrow, {}),

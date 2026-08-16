@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.10 — 2026-08-16
+
+### Fixed
+- Cursor queue UX did not load because npm `file:` installs copy plugins once into `~/.dsh/profiles/web/node_modules`. Alter now **force-syncs `plugins-local` on every boot**.
+- Queue primary button no longer disables when `inputActions` is absent (falls back to `session.prompt(..., "queue")`).
+
 ## 0.2.9 — 2026-08-16
 
 ### Added
