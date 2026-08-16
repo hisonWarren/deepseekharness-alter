@@ -115,6 +115,36 @@ rm -rf "$DST" && cp -R "$SRC" "$DST"
 2. 运行中再输入一段文字：应出现「加入排队」箭头（空草稿时仍是「停止」，这是预期）
 
 也可在应用内用社区的插件浏览器一键装其它插件（装法不同，但管理入口类似）：[dsh-find-plugin](https://github.com/topics/dsh-plugin) / [plugin-manager](https://github.com/0xsline/awesome-deepseek-harness) 等条目。
+
+---
+
+## 推荐搭配（经筛选，不是 awesome 全量）
+
+来源：[awesome-deepseek-harness](https://github.com/0xsline/awesome-deepseek-harness)。  
+原则：**互补日常任务 + 可安装产物（npm / 带 tag 的 github）+ 近期仍在维护**；与本仓库已带的排队 / UX / 费用条 / 皮肤 / 行宠等**不重复**。未达门槛的（低星、无发布、玩具向、同类堆叠）不写进推荐。
+
+### 建议现在就装（日常增益）
+
+| 插件 | 解决什么 | 安装 |
+|------|----------|------|
+| [dsh-auto-continue](https://github.com/HsiangNianian/dsh-auto-continue)（npm: `dsh-client-auto-continue`） | 非人为中断后自动排队发送「继续」；错误分类、退避、与 queue 兼容 | `dsh plugin --profile web add dsh-client-auto-continue` |
+| [dsh-composer-polish](https://github.com/tianji-qingtian/dsh-composer-polish) | 输入区 ✨ 润色草稿（flash 改写后写回，不直接发送） | `dsh plugin --profile web add "github:tianji-qingtian/dsh-composer-polish#v0.1.3"` |
+
+装完后重启 `dsh --profile web`（或重启 Alter）。运行中的实例不会热加载新 bundle。
+
+### 优秀但按需（不要默认塞进日常）
+
+| 插件 | 何时装 | 注意 |
+|------|--------|------|
+| [dsh-message-edit](https://github.com/Moeblack/dsh-message-edit) | 需要 Timeline / 分支重生成 / 助手块编辑时 | 与 `dsh-ux-polish` 的用户消息内联编辑可能叠 UI；二选一为主，或接受双入口 |
+| [dsh-chat-import](https://github.com/Nwflower/dsh-chat-import) | 从 Claude Code / Codex / Cursor 等导入历史会话时 | 迁移工具，不是常驻 Chrome；`dsh plugin --profile web add dsh-chat-import` |
+
+### 明确不推荐为「Alter 默认搭配」
+
+- 其它桌面壳 / TUI（与 Alter 定位重叠）
+- 再装一套费用条 / 皮肤 / 行宠 / Spotlight 同类（profile 里已有）
+- 低信号 UX 插件（例如仅个位数 star、无 npm/tag、能力可被 at-file 或核心队列替代的）
+
 ---
 
 ## 下载安装包（完整 Alter 桌面壳）
