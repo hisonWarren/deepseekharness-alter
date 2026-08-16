@@ -22,11 +22,11 @@
       /* Do NOT use -webkit-app-region:drag — video hit-target would break it. */
     }
     #stage.is-dragging { cursor: grabbing; }
-    /* Flip only the character sprite — never bubble/badge text. */
+    /* Videos live in #sprite; facing flip is applied to <video> only — never
+       #stage/#sprite containers (that mirrors bubble/badge into 乱码). */
     #sprite {
       position: absolute;
       inset: 0;
-      transform-origin: center;
     }
     video {
       position: absolute;
@@ -38,8 +38,10 @@
       pointer-events: none;
       opacity: 0;
       transition: opacity .18s ease;
+      transform-origin: center;
     }
     video.is-front { opacity: 1; }
+    video.face-right { transform: scaleX(-1); }
     #bubble {
       position: absolute;
       left: 50%;
@@ -151,7 +153,20 @@
       return base + encodeURIComponent(name);
     }
 
+    function setFacing(right) {
+      facingRight = !!right;
+      // Never flip #stage / #sprite — that mirrored bubble/badge text (乱码).
+      stage.style.transform = '';
+      sprite.style.transform = '';
+      va.classList.toggle('face-right', facingRight);
+      vb.classList.toggle('face-right', facingRight);
+      // Keep chrome transforms as layout-only, upright.
+      bubble.style.transform = 'translateX(-50%)';
+      badge.style.transform = 'translateX(-50%)';
+    }
+
     function showBubble(text) {
+      bubble.style.transform = 'translateX(-50%)';
       bubble.textContent = text;
       bubble.classList.add('show');
       clearTimeout(showBubble._t);
@@ -339,9 +354,7 @@
         const name = ACTS[Math.floor(Math.random() * ACTS.length)];
         if (name === '东张西望.webm') {
           playOnce(name).then(() => {
-            facingRight = !facingRight;
-            // Mirror character only; bubble/badge stay outside #sprite.
-            sprite.style.transform = facingRight ? 'scaleX(-1)' : '';
+            setFacing(!facingRight);
           });
         } else {
           playOnce(name);
