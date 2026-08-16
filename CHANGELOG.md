@@ -1,17 +1,23 @@
 # Changelog
 
+## 0.2.15 — 2026-08-16
+
+### Added
+- `dsh-ux-polish` 0.3.4: paperclip **添加文件** accepts any local file. Images still go to the draft attachment rail; non-images are copied into the workspace `.dsh-inbox/` and inserted as `@` path refs so the agent can read them (~32MB cap). Host route `POST /ux-polish/inbox`.
+
 ## 0.2.14 — 2026-08-16
 
 ### Added
 - `dsh-ux-polish` 0.3.3: composer paperclip attach menu (OS image picker to draft AttachmentRail; @ workspace file via at-file). Keeps +/command slash list as session-ops only. Live-verified after hard refresh.
+
 ## 0.2.13 — 2026-08-16
 
 ### Fixed
-- `dsh-dashscope-media` 0.1.2: compress oversized gens for session attachment (≤ ~4.5MB JPEG) so chat inline display works; keep lossless JSON-safe tool returns.
+- `dsh-dashscope-media` 0.1.2: compress oversized gens for session attachment (<= ~4.5MB JPEG) so chat inline display works; keep lossless JSON-safe tool returns.
 - `dsh-ux-polish` 0.3.2: align `@file` / at-file dock with the composer card (stop chips hanging in the left gutter); strip UTF-8 BOM from `package.json` that broke profile boot.
 
 ### Changed
-- Live-verified GPT-style `image_gen` card (creating → large gallery) on real device.
+- Live-verified GPT-style `image_gen` card (creating -> large gallery) on real device.
 
 ## 0.2.12 — 2026-08-16
 

@@ -853,6 +853,10 @@ window.__ModuleLoader__.load({
 
 			const busy = Boolean(input?.busy || input?.running);
 			const disabled = locked || !sessionId || !inputActions || busy;
+			const cwd =
+				sessions?.list?.getSnapshot?.()?.byId?.[sessionId]?.cwd ||
+				props.session?.cwd ||
+				"";
 
 			const resolveConversation = () => {
 				try {
@@ -862,26 +866,74 @@ window.__ModuleLoader__.load({
 				}
 			};
 
-			const onPickImages = (files) => {
+			const fileToBase64 = (file) =>
+				new Promise((resolve, reject) => {
+					const reader = new FileReader();
+					reader.onload = () => {
+						const result = String(reader.result || "");
+						const comma = result.indexOf(",");
+						resolve(comma >= 0 ? result.slice(comma + 1) : result);
+					};
+					reader.onerror = () => reject(reader.error || new Error("read failed"));
+					reader.readAsDataURL(file);
+				});
+
+			const appendAtPath = (relativePath) => {
+				const token = `@${String(relativePath).replace(/\\/g, "/")}`;
+				const draft = String(input?.draft || "");
+				const next = draft ? `${draft.replace(/\s+$/, "")} ${token}` : token;
+				inputActions.setDraft?.(next);
+			};
+
+			const ingestImages = (list) => {
+				const conversation = resolveConversation();
+				if (!conversation?.createDraftImages) {
+					throw new Error("当前会话无法添加图片。");
+				}
+				const images = conversation.createDraftImages(list);
+				const ids = images.map((img) => img.id);
+				if (!inputActions.addImages(ids)) {
+					conversation.releaseDraftImages?.(images);
+					throw new Error("图片未加入草稿（可能超出数量或大小限制）。");
+				}
+			};
+
+			const ingestOtherFiles = async (list) => {
+				if (!cwd) throw new Error("请先选择工作区，才能添加非图片文件。");
+				const paths = [];
+				for (const file of list) {
+					const dataBase64 = await fileToBase64(file);
+					const res = await fetch("/ux-polish/inbox", {
+						method: "POST",
+						headers: { "content-type": "application/json" },
+						body: JSON.stringify({
+							cwd,
+							name: file.name || "file",
+							dataBase64,
+						}),
+					});
+					const body = await res.json().catch(() => ({}));
+					if (!res.ok || !body?.ok || !body.relativePath) {
+						throw new Error(body?.message || `上传失败（${res.status}）`);
+					}
+					paths.push(body.relativePath);
+				}
+				for (const p of paths) appendAtPath(p);
+				return paths;
+			};
+
+			const onPickFiles = async (files) => {
 				setError("");
 				const list = Array.from(files || []).filter(Boolean);
 				if (list.length === 0) return;
-				const conversation = resolveConversation();
-				if (!conversation?.createDraftImages) {
-					setError("当前会话无法添加图片。");
-					return;
-				}
+				const images = list.filter((f) => String(f.type || "").startsWith("image/"));
+				const others = list.filter((f) => !String(f.type || "").startsWith("image/"));
 				try {
-					const images = conversation.createDraftImages(list);
-					const ids = images.map((img) => img.id);
-					if (!inputActions.addImages(ids)) {
-						conversation.releaseDraftImages?.(images);
-						setError("图片未加入草稿（可能超出数量或大小限制）。");
-						return;
-					}
+					if (images.length) ingestImages(images);
+					if (others.length) await ingestOtherFiles(others);
 					setOpen(false);
 				} catch (err) {
-					setError(err && err.message ? String(err.message) : "添加图片失败");
+					setError(err && err.message ? String(err.message) : "添加文件失败");
 				}
 			};
 
@@ -958,10 +1010,10 @@ window.__ModuleLoader__.load({
 										onClick: () => fileRef.current?.click(),
 										children: jsxs("span", {
 											children: [
-												jsx("span", { className: "dshUxAttachItemTitle", children: "添加图片" }),
+												jsx("span", { className: "dshUxAttachItemTitle", children: "添加文件" }),
 												jsx("span", {
 													className: "dshUxAttachItemDesc",
-													children: "从本机选择图片，加入输入草稿",
+													children: "任意本地文件：图片进草稿预览，其它复制到工作区 .dsh-inbox 并 @ 引用",
 												}),
 											],
 										}),
@@ -976,24 +1028,24 @@ window.__ModuleLoader__.load({
 												jsx("span", { className: "dshUxAttachItemTitle", children: "@ 工作区文件" }),
 												jsx("span", {
 													className: "dshUxAttachItemDesc",
-													children: "引用当前工作区路径（不上传内容）",
+													children: "引用当前工作区已有路径（不复制）",
 												}),
 											],
 										}),
 									}),
 									jsx("div", {
 										className: "dshUxAttachHint",
-										children: "也可直接 Ctrl+V 粘贴图片，或把文件拖入窗口。",
+										children: "图片也可 Ctrl+V / 拖入。非图片单文件上限约 32MB。",
 									}),
 									error ? jsx("div", { className: "dshUxAttachErr", children: error }) : null,
 									jsx("input", {
 										ref: fileRef,
 										className: "dshUxAttachFile",
 										type: "file",
-										accept: "image/*",
+										accept: "*/*",
 										multiple: true,
 										onChange: (e) => {
-											onPickImages(e.target.files);
+											onPickFiles(e.target.files);
 											e.target.value = "";
 										},
 									}),
