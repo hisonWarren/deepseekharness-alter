@@ -69,6 +69,14 @@ window.__ModuleLoader__.load({
 			".dshUxQAction{appearance:none;border:0;background:transparent;width:28px;height:28px;border-radius:999px;display:grid;place-items:center;padding:0;color:var(--dsw-alias-label-tertiary,rgba(127,127,127,.75));cursor:pointer}",
 			".dshUxQAction:hover:not(:disabled){background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,inherit)}",
 			".dshUxQAction:disabled{opacity:.45;cursor:default}",
+			/* Chrome frames (advisor C): drop unnecessary outlines; avoid docked-review overlap */
+			"button.cpol-btn{border-color:transparent!important;border-width:0!important}",
+			"button.cpol-btn:hover:not(:disabled){background:rgba(127,127,127,.12)!important}",
+			".dsdr-header>button.dsdr-btn{border-color:transparent!important;background:transparent!important}",
+			".dsdr-header>button.dsdr-btn:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12))!important}",
+			"[data-dsh-auto-review-button]{border:0!important;background:transparent!important;min-height:28px!important;padding:3px 6px!important;gap:4px!important;border-radius:6px!important;font:inherit!important;font-size:12px!important;line-height:18px!important;color:var(--dsw-alias-label-tertiary,#81858c)!important}",
+			"[data-dsh-auto-review-button]:hover{color:var(--dsw-alias-label-secondary,#61666b)!important;background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12))!important}",
+			'body:has(.dsdr-overlay-docked) *:has(>[aria-label="展开侧边栏"]),body:has(.dsdr-overlay-docked) *:has(>[aria-label="收起侧边栏"]){visibility:hidden!important;pointer-events:none!important}',
 		].join("");
 
 		function IconCopy({ checked }) {

@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.11 — 2026-08-16
+
+### Fixed
+- Opening GitHub (and other X-Frame-blocked sites) in the in-app sidebar no longer reloads the whole app in a loop: Electron `did-fail-load` now ignores subframe failures.
+- Companion patch pack `dsh-github-iframe-loop` waits for embed probe / eagerly blocks `github.com` before mounting an iframe.
+
+### Changed
+- `dsh-ux-polish`: peer-match session header chrome (borderless AI 审查 aligned with 变动 / open-editor; drop unnecessary 润色 outline).
+- Added local re-apply packs: `dsh-chrome-frames`, `dsh-diff-review-defaults`, `dsh-auto-review-rc6-safe`, `dsh-session-log-repair`.
+
 ## 0.2.10 — 2026-08-16
 
 ### Fixed

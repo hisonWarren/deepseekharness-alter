@@ -1233,12 +1233,20 @@ function createWindow(url) {
     applyInAppPetVisibility();
     applyChatUxPolish();
   });
-  mainWindow.webContents.on('did-fail-load', (_e, code, desc, urlFailed) => {
-    log(`did-fail-load code=${code} desc=${desc} url=${urlFailed}`);
-    if (shuttingDown) return;
+  // Subframe failures (e.g. sidebar browser iframe blocked by X-Frame-Options
+  // on github.com) must NOT reload the whole app — that restores the same tab
+  // and loops until the user switches sessions.
+  mainWindow.webContents.on('did-fail-load', (_e, code, desc, urlFailed, isMainFrame) => {
+    log(`did-fail-load code=${code} desc=${desc} url=${urlFailed} mainFrame=${isMainFrame}`);
+    if (shuttingDown || isMainFrame === false) return;
+    const appOrigin = `http://${HOST}:${chosenPort}`;
+    if (urlFailed && !String(urlFailed).startsWith(appOrigin) && urlFailed !== 'about:blank') {
+      log(`did-fail-load ignore non-app main frame: ${urlFailed}`);
+      return;
+    }
     setTimeout(() => {
       if (mainWindow && !mainWindow.isDestroyed()) {
-        mainWindow.loadURL(`http://${HOST}:${chosenPort}/`);
+        mainWindow.loadURL(`${appOrigin}/`);
       }
     }, 1200);
   });

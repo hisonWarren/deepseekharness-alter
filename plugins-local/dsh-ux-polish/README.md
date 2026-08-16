@@ -2,31 +2,30 @@
 
 DeepSeek Harness Web 插件：静音审批行、用户消息内联编辑，以及 **Cursor 式运行中排队**。
 
-来自：[hisonWarren/deepseekharness-alter](https://github.com/hisonWarren/deepseekharness-alter) → `plugins-local/dsh-ux-polish`
+来自仓库：[hisonWarren/deepseekharness-alter](https://github.com/hisonWarren/deepseekharness-alter) → `plugins-local/dsh-ux-polish`
 
-## 安装（已有 DSH）
-
-本包在 monorepo 子目录，推荐与 [dsh-plugins](https://github.com/lbh1nb/dsh-plugins) 相同：
+## 安装到已有 DSH
 
 ```bash
-git clone --depth 1 https://github.com/hisonWarren/deepseekharness-alter.git
-# 编辑 ~/.dsh/profiles/web/package.json：
-#   dependencies["dsh-ux-polish"] = "link:/abs/path/.../plugins-local/dsh-ux-polish"
-#   dsh.profile.bundles 加入 "dsh-ux-polish"
-cd ~/.dsh/profiles/web && npx -y pnpm@11.21.0 install
-dsh --profile web
+dsh plugin --profile web add "github:hisonWarren/deepseekharness-alter#main:plugins-local/dsh-ux-polish"
 ```
 
-或：
+或 clone 后：
 
 ```bash
-cd deepseekharness-alter/plugins-local/dsh-ux-polish
-dsh plugin --profile web add .
-dsh --profile web
+dsh plugin --profile web add "file:./deepseekharness-alter/plugins-local/dsh-ux-polish"
 ```
 
-官方约定见 [awesome-deepseek-harness · Install](https://github.com/0xsline/awesome-deepseek-harness#install)：`dsh plugin --profile web add "github:owner/repo#ref"`，且须有 `dsh.bundle.patch`。
+重启 `dsh web` 并硬刷新浏览器。完整说明见仓库 [README](https://github.com/hisonWarren/deepseekharness-alter#已有-deepseek-harness只装插件)。
+
+## 行为摘要
+
+| 状态 | 主控件 |
+|------|--------|
+| 空闲 | 发送 |
+| 运行中 + 空草稿 | 停止 |
+| 运行中 + 有草稿 | 排队箭头（旁侧保留停止） |
 
 ## License
 
-MIT
+MIT（随 alter 仓库）

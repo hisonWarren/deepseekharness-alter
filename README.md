@@ -9,6 +9,7 @@
 - 托盘控制：应用内 / 外行宠显示与尺寸
 - UX 抛光：静音审批行 + 用户消息内联编辑并分支
 - **Cursor 式排队**：运行中可继续输入；有草稿时主按钮变为排队箭头；输入框上方显示 Queued 条；Shift+Enter 换行
+- 修复侧边栏打开 GitHub 等禁止嵌入站点时整页反复重载
 - Windows 任务栏 DeepSeek 图标
 
 仓库：[hisonWarren/deepseekharness-alter](https://github.com/hisonWarren/deepseekharness-alter)
