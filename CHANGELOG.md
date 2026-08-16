@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.14 — 2026-08-16
+
+### Added
+- `dsh-ux-polish` 0.3.3: composer paperclip attach menu (OS image picker to draft AttachmentRail; @ workspace file via at-file). Keeps +/command slash list as session-ops only. Live-verified after hard refresh.
 ## 0.2.13 — 2026-08-16
 
 ### Fixed
