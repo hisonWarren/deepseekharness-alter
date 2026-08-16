@@ -20,8 +20,10 @@ window.__ModuleLoader__.load({
 			'[data-command-name="permission"]{display:none!important}',
 			/* Hide Todo/plan strip — Cursor queue is the metaphor, not pre-scheduled tasks */
 			'[data-testid="todo-panel"]{display:none!important}',
-			/* When Cursor queue-primary is active, hide stock Stop (svg rect affordance) */
+			/* When Cursor queue-primary is active, hide stock Stop / Send so only Queue↑ shows. */
 			'html[data-dsh-cursor-queue] [data-composer-card] button:has(svg rect[width="10"]):not([data-dsh-ux-ctrl]){display:none!important}',
+			'html[data-dsh-cursor-queue] [data-composer-card] button[aria-label="发送消息"]{display:none!important}',
+			'html[data-dsh-cursor-queue] [data-composer-card] button[aria-label="停止"],html[data-dsh-cursor-queue] [data-composer-card] button[aria-label="Stop"]{display:none!important}',
 			/* User bubble edit chrome */
 			".dshUxUser{display:flex;flex-direction:column;align-items:flex-end;gap:6px;min-width:0}",
 			".dshUxBubble{max-width:min(100%,var(--dsh-chat-content-width,720px));padding:10px 14px;border-radius:18px;background:var(--dsw-alias-fill-swatch-1,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,inherit);font:var(--dsw-font-m-16,14px/1.5);white-space:pre-wrap;word-break:break-word}",
@@ -39,15 +41,12 @@ window.__ModuleLoader__.load({
 			".dshUxErr{max-width:min(100%,560px);font-size:12px;line-height:1.35;color:var(--dsw-alias-state-error-primary,#c44);text-align:right}",
 			".dshUxMeta{font-size:11px;opacity:.55;margin-right:6px}",
 			".dshUxIcon{width:16px;height:16px;display:block}",
-			/* Cursor-like primary morph controls (sit in input.right, before hidden Stop) */
+			/* Cursor-like primary morph: Queue↑ only (no companion Stop). */
 			".dshUxCursorCtrls{display:inline-flex;align-items:center;gap:6px;margin-left:4px}",
-			".dshUxCursorStop,.dshUxCursorQueue{appearance:none;border:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:0;transition:background-color .12s ease,opacity .12s ease,transform .12s ease}",
-			".dshUxCursorStop{width:28px;height:28px;border-radius:8px;color:var(--dsw-alias-label-secondary,rgba(127,127,127,.9));background:transparent}",
-			".dshUxCursorStop:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,inherit)}",
-			".dshUxCursorQueue{width:32px;height:32px;border-radius:999px;color:#fff;background:var(--dsw-static-deepseek-500,#4d6bfe);box-shadow:0 1px 2px rgba(0,0,0,.12)}",
+			".dshUxCursorQueue{appearance:none;border:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:0;transition:background-color .12s ease,opacity .12s ease,transform .12s ease;width:32px;height:32px;border-radius:999px;color:#fff;background:var(--dsw-static-deepseek-500,#4d6bfe);box-shadow:0 1px 2px rgba(0,0,0,.12)}",
 			".dshUxCursorQueue:hover{filter:brightness(1.06);transform:translateY(-0.5px)}",
 			".dshUxCursorQueue:active{transform:translateY(0)}",
-			".dshUxCursorQueue:disabled,.dshUxCursorStop:disabled{opacity:.45;cursor:default;transform:none}",
+			".dshUxCursorQueue:disabled{opacity:.45;cursor:default;transform:none}",
 			/* Cursor-like queue strip — width matches composer card */
 			".dshUxQDock{box-sizing:border-box;width:calc(100% - 2 * var(--dsh-composer-side-clearance,16px));max-width:var(--dsh-composer-card-max-width);margin:0 auto calc(0px - var(--dsh-composer-stack-gap,8px) - 2px);padding:0;flex:none}",
 			".dshUxQPanel{position:relative;width:100%;overflow:hidden;border-radius:12px 12px 0 0;background:var(--dsw-specific-tip,var(--dsw-alias-bg-elevated,rgba(127,127,127,.06)));padding:2px 0}",
@@ -136,16 +135,6 @@ window.__ModuleLoader__.load({
 					fill: "currentColor",
 					d: "M8.3125 0.980183C8.66767 1.0531 8.97902 1.20418 9.2627 1.43233C9.48724 1.61297 9.73029 1.85793 9.97949 2.10714L14.707 6.83468L13.293 8.24874L9 3.95577V15.0417H7V3.95577L2.70703 8.24874L1.29297 6.83468L6.02051 2.10714C6.26971 1.85793 6.51277 1.61297 6.7373 1.43233C6.97662 1.23986 7.28445 1.04402 7.6875 0.980183C7.8973 0.947006 8.1031 0.95516 8.3125 0.980183Z",
 				}),
-			});
-		}
-
-		function IconStopSquare() {
-			return jsx("svg", {
-				viewBox: "0 0 16 16",
-				width: 14,
-				height: 14,
-				"aria-hidden": true,
-				children: jsx("rect", { x: "3", y: "3", width: "10", height: "10", rx: "3", fill: "currentColor" }),
 			});
 		}
 
@@ -314,7 +303,9 @@ window.__ModuleLoader__.load({
 
 		/**
 		 * Cursor-style primary morph: while agent is running and the draft is
-		 * non-empty, replace stock Stop with Queue↑ (+ compact Stop still reachable).
+		 * non-empty, replace stock Stop/Send with Queue↑ only.
+		 * Stop is not shown beside Queue — clear the draft (or wait until after
+		 * send) so the primary becomes the stock Stop, matching Cursor.
 		 * Click uses inputActions.submit() → always queue (matches core contract).
 		 */
 		function CursorQueueSend(props) {
@@ -361,46 +352,26 @@ window.__ModuleLoader__.load({
 				} catch (_) {}
 			};
 
-			const onStop = () => {
-				const session = sessions?.binding?.(sessionId)?.session;
-				if (session?.cancel) {
-					session.cancel().catch(() => {});
-					return;
-				}
-			};
-
 			const keepFocus = (e) => {
 				e.preventDefault();
 			};
 
 			if (!queueMode) return null;
 
-			return jsxs("div", {
+			return jsx("div", {
 				className: "dshUxCursorCtrls",
 				"data-dsh-ux-cursor-ctrls": "",
-				children: [
-					jsx("button", {
-						type: "button",
-						className: "dshUxCursorStop",
-						"data-dsh-ux-ctrl": "stop",
-						title: "停止",
-						"aria-label": "停止",
-						onMouseDown: keepFocus,
-						onClick: onStop,
-						children: jsx(IconStopSquare, {}),
-					}),
-					jsx("button", {
-						type: "button",
-						className: "dshUxCursorQueue",
-						"data-dsh-ux-ctrl": "queue",
-						title: "加入排队（当前回合结束后发送）",
-						"aria-label": "加入排队",
-						disabled: machineBusy,
-						onMouseDown: keepFocus,
-						onClick: onQueue,
-						children: jsx(IconQueueArrow, {}),
-					}),
-				],
+				children: jsx("button", {
+					type: "button",
+					className: "dshUxCursorQueue",
+					"data-dsh-ux-ctrl": "queue",
+					title: "加入排队（当前回合结束后发送）",
+					"aria-label": "加入排队",
+					disabled: machineBusy,
+					onMouseDown: keepFocus,
+					onClick: onQueue,
+					children: jsx(IconQueueArrow, {}),
+				}),
 			});
 		}
 

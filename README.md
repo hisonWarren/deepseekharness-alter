@@ -8,8 +8,10 @@
 - 稳定启动（端口回收、单实例、直连默认）
 - 托盘控制：应用内 / 外行宠显示与尺寸
 - UX 抛光：静音审批行 + 用户消息内联编辑并分支
-- **Cursor 式排队**：运行中可继续输入；有草稿时主按钮变为排队箭头；输入框上方显示 Queued 条；Shift+Enter 换行
+- **Cursor 式排队**：运行中可继续输入；有草稿时主按钮变为排队箭头（无旁路 Stop）；输入框上方显示 Queued 条；Shift+Enter 换行
 - 修复侧边栏打开 GitHub 等禁止嵌入站点时整页反复重载
+- 百炼生图 `dsh-dashscope-media`：工具成功可序列化 + 对话内联预览
+- 资源管理器自动刷新补丁 `dsh-explorer-auto-refresh`
 - Windows 任务栏 DeepSeek 图标
 
 仓库：[hisonWarren/deepseekharness-alter](https://github.com/hisonWarren/deepseekharness-alter)
@@ -172,7 +174,7 @@ rm -rf "$DST" && cp -R "$SRC" "$DST"
 |------|--------|
 | 空闲 | 发送 |
 | 运行中 + 输入框为空 | 停止 |
-| 运行中 + 有草稿 | **排队箭头**（并保留小停止键） |
+| 运行中 + 有草稿 | **排队箭头**（清空草稿后主控件恢复为停止） |
 
 - Enter：运行中默认入队（核心 `busyEnter`）
 - Shift+Enter：换行

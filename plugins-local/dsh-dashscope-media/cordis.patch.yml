@@ -1,0 +1,4 @@
+# dsh-dashscope-media — Token Plan 媒体工具（主机侧插件行）
+- insert:
+    - id: dashscope-media
+      name: 'dsh-dashscope-media'

@@ -1,7 +1,7 @@
 {
-  "name": "dsh-ux-polish",
-  "version": "0.3.1",
-  "description": "Quieter chat chrome, inline user-message edit, and Cursor-style mid-run queue (Queue↑ only + Queued strip).",
+  "name": "dsh-dashscope-media",
+  "version": "0.1.1",
+  "description": "Alibaba Cloud Token Plan media tools: image_gen (wan2.7/qwen-image sync) with GPT-style in-chat display, plus video_gen/video_status and tts.",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
@@ -18,7 +18,8 @@
       "platform": "web",
       "inject": [
         "@deepseek-ai/dsh-client-runtime",
-        "@deepseek-ai/dsh-client-ui-slots"
+        "@deepseek-ai/dsh-client-ui-slots",
+        "@deepseek-ai/dsh-client-ui-primitives"
       ]
     }
   },
@@ -26,6 +27,7 @@
     "@deepseek-ai/cordis": "^4.0.1",
     "@deepseek-ai/dsh-client-runtime": "^0.1.0-rc.6",
     "@deepseek-ai/dsh-client-ui-slots": "^0.1.0-rc.6",
+    "@deepseek-ai/dsh-client-ui-primitives": "^0.1.0-rc.6",
     "react": "^18.2.0"
   }
 }

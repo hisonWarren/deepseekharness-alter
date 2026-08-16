@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.12 — 2026-08-16
+
+### Added
+- `dsh-dashscope-media` 0.1.1: Token Plan `image_gen` / video / TTS tools; sanitize tool returns for DSH lossless JSON; GPT-style in-chat image toolview (no multi-model retry after success).
+- `dsh-explorer-auto-refresh`: re-apply pack so Better Sidebar Explorer soft-refreshes expanded dirs (~2s / focus) instead of only the manual refresh button.
+
+### Changed
+- `dsh-ux-polish` 0.3.1: queue mode shows Queue↑ only (no companion gray Stop beside it); stock Stop returns when the draft is cleared.
+- Alter boot re-applies `dsh-explorer-auto-refresh` / `dsh-github-iframe-loop` Python patches after syncing `plugins-local`.
+
 ## 0.2.11 — 2026-08-16
 
 ### Fixed

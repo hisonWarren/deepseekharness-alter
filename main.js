@@ -633,6 +633,33 @@ function syncBundledPlugins() {
   }
 }
 
+/**
+ * Re-apply source patches that live outside npm packages (better-sidebar Explorer
+ * auto-refresh, GitHub iframe early-block). Idempotent Python scripts; skip if
+ * python is missing.
+ */
+function applyRepairPacks() {
+  const packs = [
+    ['dsh-explorer-auto-refresh', 'patch-client.py'],
+    ['dsh-github-iframe-loop', 'patch-client.py'],
+  ];
+  for (const [dir, scriptName] of packs) {
+    const script = path.join(__dirname, 'plugins-local', dir, scriptName);
+    if (!fs.existsSync(script)) continue;
+    try {
+      const out = execFileSync('python', [script], {
+        encoding: 'utf8',
+        windowsHide: true,
+        timeout: 30000,
+      });
+      log(`repairPack ${dir}: ${String(out || '').trim().replace(/\s+/g, ' ')}`);
+    } catch (err) {
+      const detail = err && (err.stdout || err.stderr || err.message);
+      log(`repairPack ${dir} skipped/failed: ${String(detail || err).trim().slice(0, 300)}`);
+    }
+  }
+}
+
 function startDsh(port) {
   return new Promise((resolve, reject) => {
     const dshBin = path.join(DSH_ROOT, 'node_modules', '@deepseek-ai', 'dsh', 'lib', 'bin.js');
@@ -1266,6 +1293,7 @@ function createWindow(url) {
 async function boot() {
   cleanupStaleServer();
   syncBundledPlugins();
+  applyRepairPacks();
   await waitUntilPortFree(DEFAULT_PORT, 6000);
   createSplash();
   try {
