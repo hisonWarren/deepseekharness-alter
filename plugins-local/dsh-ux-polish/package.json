@@ -1,7 +1,7 @@
 {
   "name": "dsh-ux-polish",
-  "version": "0.3.6",
-  "description": "Quieter chat chrome, Cursor queue, attach→.dsh-inbox, docked 变动 sidebar reserve + soft frame.",
+  "version": "0.3.7",
+  "description": "Quieter chat chrome, Cursor queue, attach inbox, docked 变动 reserve, AI 审查 card polish.",
   "type": "module",
   "main": "lib/index.js",
   "exports": {

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.17 — 2026-08-16
+
+### Changed
+- `dsh-ux-polish` 0.3.7: **AI 审查** panel CSS polish — elevated card (12px radius + shadow), title hierarchy, label/value rows, active On/Off pill, section dividers; clear harsh trigger outline to match Session log chrome.
+
 ## 0.2.16 — 2026-08-16
 
 ### Added
