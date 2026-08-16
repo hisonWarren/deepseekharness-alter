@@ -1,7 +1,7 @@
 {
   "name": "dsh-ux-polish",
-  "version": "0.2.2",
-  "description": "Quieter chat chrome + ChatGPT-style inline user-message edit (fork/branch).",
+  "version": "0.3.0",
+  "description": "Quieter chat chrome, inline user-message edit, and Cursor-style mid-run queue (primary morph + Queued strip).",
   "type": "module",
   "main": "lib/index.js",
   "exports": {

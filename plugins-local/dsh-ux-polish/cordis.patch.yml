@@ -1,4 +1,4 @@
-# dsh-ux-polish — quieter chrome + inline user edit (fork/branch)
+# dsh-ux-polish — quieter chrome + inline edit + Cursor-style queue
 - insert:
     - id: ux-polish
       name: 'dsh-ux-polish'

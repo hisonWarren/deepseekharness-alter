@@ -1104,15 +1104,19 @@ function applyInAppPetVisibility() {
   }
 }
 
-/** Quieter chrome + Codex-like refill-edit (safe, debounced — no freeze). */
+/** Quieter chrome + Cursor queue CSS backups (plugin owns interactive controls). */
 function applyChatUxPolish() {
   if (!mainWindow || mainWindow.isDestroyed()) return;
-  // Shell CSS backup; plugin owns the interactive edit button.
+  // Shell CSS backup; dsh-ux-polish owns edit + Cursor queue morph.
   const css = `
     .Md3f7G_flowItem:has([data-context-source="user-approval"]),
     .Md3f7G_flowItem:has([data-command-name="permission"]),
     [data-context-source="user-approval"],
     [data-command-name="permission"] { display: none !important; }
+    [data-testid="todo-panel"] { display: none !important; }
+    html[data-dsh-cursor-queue] [data-composer-card] button:has(svg rect[width="10"]):not([data-dsh-ux-ctrl]) {
+      display: none !important;
+    }
     .dshUxReedit{
       appearance:none;border:0;background:transparent;color:inherit;
       opacity:.7;cursor:pointer;padding:2px 8px;font-size:12px;line-height:1.2;

@@ -1,8 +1,8 @@
 {
   "name": "deepseekharness-alter",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "private": false,
-  "description": "Desktop shell alter for DeepSeek Harness - tray pet controls, UX polish, stable Windows boot",
+  "description": "Desktop shell alter for DeepSeek Harness - tray pet, Cursor-style queue UX, stable Windows boot",
   "author": "hisonWarren",
   "license": "MIT",
   "repository": {
@@ -30,7 +30,7 @@
   "build": {
     "appId": "com.hisonwarren.deepseekharness.alter",
     "productName": "DeepSeek Harness Alter",
-    "copyright": "漏 hisonWarren",
+    "copyright": "Copyright hisonWarren",
     "publish": [
       {
         "provider": "github",
