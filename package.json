@@ -1,6 +1,6 @@
 {
   "name": "deepseekharness-alter",
-  "version": "0.2.12",
+  "version": "0.2.13",
   "private": false,
   "description": "Desktop shell alter for DeepSeek Harness - tray pet, Cursor-style queue UX, stable Windows boot",
   "author": "hisonWarren",

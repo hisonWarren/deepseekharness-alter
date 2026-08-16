@@ -1,7 +1,7 @@
 {
   "name": "dsh-dashscope-media",
-  "version": "0.1.1",
-  "description": "Alibaba Cloud Token Plan media tools: image_gen (wan2.7/qwen-image sync) with GPT-style in-chat display, plus video_gen/video_status and tts.",
+  "version": "0.1.2",
+  "description": "Alibaba Cloud Token Plan media tools: image_gen with compress-for-attachment + GPT-style in-chat card, plus video/tts.",
   "type": "module",
   "main": "lib/index.js",
   "exports": {

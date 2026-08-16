@@ -24,6 +24,12 @@ window.__ModuleLoader__.load({
 			'html[data-dsh-cursor-queue] [data-composer-card] button:has(svg rect[width="10"]):not([data-dsh-ux-ctrl]){display:none!important}',
 			'html[data-dsh-cursor-queue] [data-composer-card] button[aria-label="发送消息"]{display:none!important}',
 			'html[data-dsh-cursor-queue] [data-composer-card] button[aria-label="停止"],html[data-dsh-cursor-queue] [data-composer-card] button[aria-label="Stop"]{display:none!important}',
+			/* Align @file mention chips with composer card (stop hanging in left gutter) */
+			'[data-at-file-dock],.dsh_atFile_rail{box-sizing:border-box!important;width:calc(100% - 2 * var(--dsh-composer-side-clearance,16px))!important;max-width:var(--dsh-composer-card-max-width,720px)!important;margin:0 auto 6px!important;padding:0 2px!important;justify-content:flex-start!important}',
+			'.dsh_atFile_row{max-width:100%!important}',
+			/* Produced-file chips: keep inside chat content width */
+			'[data-produced-files-row]{max-width:100%!important}',
+			'.P4kPIW_root{width:100%!important;max-width:var(--dsh-chat-content-width,720px)!important;box-sizing:border-box!important;padding-left:0!important;margin-left:0!important}',
 			/* User bubble edit chrome */
 			".dshUxUser{display:flex;flex-direction:column;align-items:flex-end;gap:6px;min-width:0}",
 			".dshUxBubble{max-width:min(100%,var(--dsh-chat-content-width,720px));padding:10px 14px;border-radius:18px;background:var(--dsw-alias-fill-swatch-1,rgba(127,127,127,.12));color:var(--dsw-alias-label-primary,inherit);font:var(--dsw-font-m-16,14px/1.5);white-space:pre-wrap;word-break:break-word}",

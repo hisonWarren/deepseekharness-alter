@@ -3,6 +3,7 @@
 // so no subprocess bridge is needed here. Tool names match the session bridge
 // plugin (dshmd-2) so prompts and habits carry over.
 import { mkdirSync, writeFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { join } from 'node:path';
 import { defineTool } from '@deepseek-ai/dsh-tools';
 
@@ -12,6 +13,8 @@ const VID_API = MEDIA_HOST + '/api/v1/services/aigc/video-generation/video-synth
 const TASK_API = MEDIA_HOST + '/api/v1/tasks/';
 const TTS_API = MEDIA_HOST + '/api/v1/services/audio/tts/SpeechSynthesizer';
 const OBJ_SCHEMA = { type: 'object', additionalProperties: true };
+/** DSH local attachment default is 5MB; leave headroom for JPEG overhead. */
+const ATTACH_MAX_BYTES = 4.5 * 1024 * 1024;
 
 function mediaTypeFrom(url, contentType) {
   if (contentType && contentType.indexOf('image/') === 0) return contentType.split(';')[0].trim();
@@ -20,6 +23,18 @@ function mediaTypeFrom(url, contentType) {
   if (u.indexOf('.webp') !== -1) return 'image/webp';
   if (u.indexOf('.gif') !== -1) return 'image/gif';
   return 'image/png';
+}
+
+/** Prefer magic bytes over Content-Type / URL guesses (avoids IMAGE_TYPE_MISMATCH). */
+function detectMediaType(buf, fallback) {
+  if (!buf || buf.length < 12) return fallback;
+  if (buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47) return 'image/png';
+  if (buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return 'image/jpeg';
+  if (buf[0] === 0x47 && buf[1] === 0x49 && buf[2] === 0x46) return 'image/gif';
+  if (buf[0] === 0x52 && buf[1] === 0x49 && buf[2] === 0x46 && buf[3] === 0x46 && buf[8] === 0x57 && buf[9] === 0x45 && buf[10] === 0x42 && buf[11] === 0x50) {
+    return 'image/webp';
+  }
+  return fallback;
 }
 
 function extFor(mt) {
@@ -46,6 +61,49 @@ function attachmentRef(ref) {
   };
   if (typeof ref.name === 'string' && ref.name.length > 0) out.name = ref.name;
   return out;
+}
+
+function loadSharp() {
+  try {
+    const require = createRequire(import.meta.url);
+    return require('sharp');
+  } catch (_) {
+    try {
+      const require = createRequire(import.meta.url);
+      const att = require.resolve('@deepseek-ai/dsh-attachment-local/package.json');
+      return createRequire(att)('sharp');
+    } catch (err) {
+      return undefined;
+    }
+  }
+}
+
+/** Shrink large rasters so ctx.attachments.saveImage (5MB default) can admit them. */
+async function forAttachment(buf, mediaType) {
+  if (buf.byteLength <= ATTACH_MAX_BYTES) return { data: buf, mediaType, compressed: false };
+  const sharp = loadSharp();
+  if (!sharp) return { data: buf, mediaType, compressed: false, compressError: 'sharp unavailable' };
+  try {
+    let quality = 82;
+    let width = 2048;
+    let out = await sharp(buf, { failOn: 'none', limitInputPixels: false })
+      .rotate()
+      .resize({ width, height: width, fit: 'inside', withoutEnlargement: true })
+      .jpeg({ quality, mozjpeg: true })
+      .toBuffer();
+    while (out.byteLength > ATTACH_MAX_BYTES && (quality > 45 || width > 1024)) {
+      if (quality > 45) quality -= 12;
+      else width = Math.max(1024, Math.floor(width * 0.85));
+      out = await sharp(buf, { failOn: 'none', limitInputPixels: false })
+        .rotate()
+        .resize({ width, height: width, fit: 'inside', withoutEnlargement: true })
+        .jpeg({ quality, mozjpeg: true })
+        .toBuffer();
+    }
+    return { data: new Uint8Array(out), mediaType: 'image/jpeg', compressed: true, originalBytes: buf.byteLength };
+  } catch (err) {
+    return { data: buf, mediaType, compressed: false, compressError: String((err && err.message) || err) };
+  }
 }
 
 async function apiKey(credentials) {
@@ -102,12 +160,29 @@ export function apply(ctx) {
           if (img && img.attachment) blocks.push({ type: 'image', attachment: img.attachment });
         }
         const okCount = images.filter((img) => img && img.ok && img.attachment).length;
+        const fileCount = images.filter((img) => img && img.ok && img.file).length;
         if (value && value.ok) {
+          let text;
+          if (okCount > 0) {
+            text = '已生成 ' + okCount + ' 张图片（' + (value.model || 'image_gen') + '），已在对话中显示。';
+          } else if (fileCount > 0) {
+            const notes = images.map((img) => img && img.attachmentNote).filter(Boolean).join('; ');
+            text = '已保存 ' + fileCount + ' 张到工作区；会话附件登记失败（' + (notes || 'unknown') + '）。下方若仍无图，请打开 dashscope-media/。';
+          } else {
+            text = '图片请求成功，但未能登记会话附件：' + (value.note || '见 images[].attachmentNote');
+          }
+          blocks.push({ type: 'text', text });
+          // Client toolview may fall back to /sidebar/file when attachment is missing.
           blocks.push({
             type: 'text',
-            text: okCount > 0
-              ? '已生成 ' + okCount + ' 张图片（' + (value.model || 'image_gen') + '），已在对话中显示。'
-              : '图片请求成功，但未能登记会话附件：' + (value.note || '见 images[].attachmentNote'),
+            text: '__dsh_media__' + JSON.stringify({
+              images: images.map((img) => ({
+                ok: !!(img && img.ok),
+                file: img && img.file,
+                attachment: img && img.attachment,
+                attachmentNote: img && img.attachmentNote,
+              })),
+            }),
           });
         } else {
           blocks.push({ type: 'text', text: JSON.stringify(value, null, 2) });
@@ -161,16 +236,33 @@ export function apply(ctx) {
             images.push({ index: i, ok: false, url: urls[i], note: '下载失败 HTTP ' + r.status });
             continue;
           }
-          const buf = new Uint8Array(await r.arrayBuffer());
-          const mt = mediaTypeFrom(urls[i], r.headers.get('content-type'));
+          const raw = new Uint8Array(await r.arrayBuffer());
+          const guessed = mediaTypeFrom(urls[i], r.headers.get('content-type'));
+          const mt = detectMediaType(raw, guessed);
           const file = join(outDir, 'gen-' + Date.now() + '-' + i + extFor(mt));
-          writeFileSync(file, buf);
-          const row = { index: i, ok: true, url: urls[i], file, mediaType: mt, bytes: buf.length };
+          writeFileSync(file, raw);
+          const row = { index: i, ok: true, url: urls[i], file, mediaType: mt, bytes: raw.length };
           try {
-            const ref = await ctx.attachments.saveImage({ data: buf, mediaType: mt, name: basename(file) });
+            const prepared = await forAttachment(raw, mt);
+            if (prepared.compressError) row.compressNote = prepared.compressError;
+            if (prepared.compressed) {
+              row.attachmentBytes = prepared.data.byteLength;
+              row.compressed = true;
+            }
+            const attachName =
+              prepared.mediaType === 'image/jpeg'
+                ? basename(file).replace(/\.[^.]+$/, '.jpg')
+                : basename(file);
+            const ref = await ctx.attachments.saveImage({
+              data: prepared.data,
+              mediaType: prepared.mediaType,
+              name: attachName,
+            });
             row.attachment = attachmentRef(ref);
           } catch (err) {
-            row.attachmentNote = String((err && err.message) || err);
+            const msg = String((err && err.message) || err);
+            const code = err && err.code ? String(err.code) : undefined;
+            row.attachmentNote = code ? code + ': ' + msg : msg;
           }
           images.push(row);
         } catch (err) {
@@ -184,7 +276,7 @@ export function apply(ctx) {
         usage: body.usage,
         outDir,
         url_expires_in_hours: 24,
-        note: '图片已保存并作为会话附件显示。成功后勿换模型重试。OSS URL 24 小时后过期。',
+        note: '图片已保存；优先作为会话附件内联显示。成功后勿换模型重试。OSS URL 24 小时后过期。',
         images,
       });
     },
