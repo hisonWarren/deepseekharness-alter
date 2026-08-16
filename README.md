@@ -26,31 +26,76 @@
 
 ## 已有 DeepSeek Harness：只装插件
 
-插件路径：仓库内 [`plugins-local/dsh-ux-polish`](https://github.com/hisonWarren/deepseekharness-alter/tree/main/plugins-local/dsh-ux-polish)
+插件目录：[`plugins-local/dsh-ux-polish`](https://github.com/hisonWarren/deepseekharness-alter/tree/main/plugins-local/dsh-ux-polish)  
+（包内已声明 `dsh.bundle.patch`，符合 [awesome-deepseek-harness](https://github.com/0xsline/awesome-deepseek-harness) / 官方的 bundle 安装约定。）
 
-### 方法 A（推荐）：`dsh plugin add`
+社区常用装法（可直接照抄同类插件）：
 
-在已能跑 `dsh web` 的机器上：
+| 模式 | 代表 | 适合你时 |
+|------|------|----------|
+| `dsh plugin add "github:owner/repo#tag"` | [dsh-composer-polish](https://github.com/tianji-qingtian/dsh-composer-polish) | 仓库**根目录就是插件**（一行装） |
+| clone + `link:绝对路径` 写进 profile | [lbh1nb/dsh-plugins](https://github.com/lbh1nb/dsh-plugins)（含 steer-button） | **monorepo 子目录插件**（本仓库就是这种） |
+| 官方总说明 | [awesome Install](https://github.com/0xsline/awesome-deepseek-harness#install) | `dsh plugin` 转发 pnpm；装完需重启 |
+
+> 注意：awesome 写明旧的「仓库子路径 / Repository Plugin」装法已不在官方主流流程里。本仓库根目录是 Electron 壳，**不能**对仓库根直接 `github:hisonWarren/deepseekharness-alter`，否则会装错包。请用下面的 **方法 A / B**。
+
+### 方法 A（推荐，monorepo 子包）：clone + `link:`（对齐 dsh-plugins）
 
 ```bash
-# 装到 web profile（常见）
-dsh plugin --profile web add "github:hisonWarren/deepseekharness-alter#main:plugins-local/dsh-ux-polish"
-
-# 若 peer 依赖冲突，可先 clone 再本地装：
 git clone --depth 1 https://github.com/hisonWarren/deepseekharness-alter.git
-dsh plugin --profile web add "file:./deepseekharness-alter/plugins-local/dsh-ux-polish"
 ```
 
-然后确认 profile 的 `bundles` 里包含 `dsh-ux-polish`（`dsh plugin add` 通常会自动写入）。  
-重启 `dsh web`（或刷新页面），在设置 → Plugins 里应能看到 `dsh-ux-polish`。
+编辑 `~/.dsh/profiles/web/package.json`（Windows：`%USERPROFILE%\.dsh\profiles\web\package.json`），加入依赖与 bundle（路径改成你的绝对路径，用正斜杠）：
 
-### 方法 B：手动拷到 profile（npm `file:` 装过旧版时尤其有用）
+```json
+{
+  "dependencies": {
+    "dsh-ux-polish": "link:C:/path/to/deepseekharness-alter/plugins-local/dsh-ux-polish"
+  },
+  "dsh": {
+    "profile": {
+      "bundles": [
+        "dsh-ux-polish"
+      ]
+    }
+  }
+}
+```
 
-`npm` 的 `file:` 依赖往往是**一次性拷贝**，改源码不会自动更新。可强制覆盖：
+然后在 profile 目录安装并重启：
 
 ```bash
-# Windows (PowerShell) — 把插件拷进已部署的 web profile
-$src = "D:\path\to\deepseekharness-alter\plugins-local\dsh-ux-polish"
+cd ~/.dsh/profiles/web   # Windows: %USERPROFILE%\.dsh\profiles\web
+pnpm install             # 或: npx -y pnpm@11.21.0 install
+dsh --profile web        # 重启；运行中的实例不会热加载新 bundle
+```
+
+`link:` 指向源码目录时，以后 `git pull` 更新 alter 仓库再重启即可（比 `file:` 拷贝更不容易装到旧版）。
+
+### 方法 B：在插件目录里 `dsh plugin add .`
+
+```bash
+git clone --depth 1 https://github.com/hisonWarren/deepseekharness-alter.git
+cd deepseekharness-alter/plugins-local/dsh-ux-polish
+dsh plugin --profile web add .
+```
+
+（相对路径 `.` 会锚定到当前目录，与官方 CLI 行为一致。）
+
+需要全局 CLI 时：
+
+```bash
+npm install -g @deepseek-ai/dsh
+# 或: npx @deepseek-ai/dsh plugin --profile web add .
+```
+
+### 方法 C：强制覆盖已安装的旧拷贝
+
+若以前用 `file:` 装过旧版，`node_modules` 里可能仍是一次性拷贝：
+
+```powershell
+# Windows PowerShell
+$src = "C:\path\to\deepseekharness-alter\plugins-local\dsh-ux-polish"
 $dst = "$env:USERPROFILE\.dsh\profiles\web\node_modules\dsh-ux-polish"
 Copy-Item -Recurse -Force $src $dst
 ```
@@ -62,32 +107,14 @@ DST="$HOME/.dsh/profiles/web/node_modules/dsh-ux-polish"
 rm -rf "$DST" && cp -R "$SRC" "$DST"
 ```
 
-并在 `~/.dsh/profiles/web/package.json` 中保证：
+确认 `package.json` 的 `version` ≥ `0.3.0`，然后重启 `dsh web` 并硬刷新（Ctrl+Shift+R）。
 
-```json
-{
-  "dependencies": {
-    "dsh-ux-polish": "file:../path-or-keep-existing"
-  },
-  "dsh": {
-    "profile": {
-      "bundles": [
-        "...",
-        "dsh-ux-polish"
-      ]
-    }
-  }
-}
-```
+### 装好后怎么确认
 
-然后**重启** `dsh web`，浏览器硬刷新（Ctrl+Shift+R）。
+1. 设置 → Plugins 能看到 `dsh-ux-polish`
+2. 运行中再输入一段文字：应出现「加入排队」箭头（空草稿时仍是「停止」，这是预期）
 
-### 升级后仍看不到排队箭头？
-
-1. 看 `~/.dsh/profiles/web/node_modules/dsh-ux-polish/package.json` 的 `version` 是否 ≥ `0.3.0`
-2. 若仍是旧版，用方法 B 强制覆盖
-3. 运行中先**再输入一段文字**：空草稿时仍是「停止」；有草稿才会变成「加入排队」
-
+也可在应用内用社区的插件浏览器一键装其它插件（装法不同，但管理入口类似）：[dsh-find-plugin](https://github.com/topics/dsh-plugin) / [plugin-manager](https://github.com/0xsline/awesome-deepseek-harness) 等条目。
 ---
 
 ## 下载安装包（完整 Alter 桌面壳）

@@ -1,59 +1,31 @@
 # dsh-ux-polish
 
-DeepSeek Harness **Web 客户端插件**：更安静的审批行、用户消息内联编辑（分支）、以及 **Cursor 式中途排队**。
+DeepSeek Harness Web 插件：静音审批行、用户消息内联编辑，以及 **Cursor 式运行中排队**。
 
-本插件位于 [hisonWarren/deepseekharness-alter](https://github.com/hisonWarren/deepseekharness-alter) 的 `plugins-local/dsh-ux-polish`。  
-**不需要**安装 Electron 桌面壳；可直接装进你已有的 `dsh web` profile。
+来自仓库：[hisonWarren/deepseekharness-alter](https://github.com/hisonWarren/deepseekharness-alter) → `plugins-local/dsh-ux-polish`
 
-## 功能
-
-- 隐藏嘈杂的审批 / permission 行
-- 用户气泡：复制、编辑并分支到新对话
-- 运行中可继续输入；有草稿时主控件变为 **排队箭头**（旁侧保留停止）
-- 输入框上方 **N Queued** 条（编辑 / steer / 删除）
-- 隐藏 Todo「预排任务」条，避免和 Queue 混淆
-
-## 安装到已有 DeepSeek Harness
-
-### 推荐
+## 安装到已有 DSH
 
 ```bash
-git clone --depth 1 https://github.com/hisonWarren/deepseekharness-alter.git
-dsh plugin --profile web add "./deepseekharness-alter/plugins-local/dsh-ux-polish"
+dsh plugin --profile web add "github:hisonWarren/deepseekharness-alter#main:plugins-local/dsh-ux-polish"
 ```
 
-然后重启 `dsh web`，浏览器硬刷新。
-
-### 或写入 `~/.dsh/profiles/web/package.json`
-
-```json
-{
-  "dependencies": {
-    "dsh-ux-polish": "github:hisonWarren/deepseekharness-alter#v0.2.10:plugins-local/dsh-ux-polish"
-  },
-  "dsh": {
-    "profile": {
-      "bundles": ["dsh-ux-polish"]
-    }
-  }
-}
-```
+或 clone 后：
 
 ```bash
-cd ~/.dsh/profiles/web
-npm install --legacy-peer-deps
+dsh plugin --profile web add "file:./deepseekharness-alter/plugins-local/dsh-ux-polish"
 ```
 
-完整说明见仓库根 [README.md](../../README.md#已有-deepseek-harness只装完善后的插件)。
+重启 `dsh web` 并硬刷新浏览器。完整说明见仓库 [README](https://github.com/hisonWarren/deepseekharness-alter#已有-deepseek-harness只装插件)。
 
-## 验证
+## 行为摘要
 
-```js
-!!document.querySelector('style[data-plugin-css="dsh-ux-polish/style.css"]')
-```
-
-运行中输入草稿后，应出现「加入排队」按钮。
+| 状态 | 主控件 |
+|------|--------|
+| 空闲 | 发送 |
+| 运行中 + 空草稿 | 停止 |
+| 运行中 + 有草稿 | 排队箭头（旁侧保留停止） |
 
 ## License
 
-MIT（与主仓库相同）
+MIT（随 alter 仓库）
