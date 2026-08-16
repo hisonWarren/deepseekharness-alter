@@ -13,7 +13,84 @@
 
 仓库：[hisonWarren/deepseekharness-alter](https://github.com/hisonWarren/deepseekharness-alter)
 
-## 下载
+---
+
+## 两种用法（选一）
+
+| 你的情况 | 怎么用 |
+|----------|--------|
+| 想要完整桌面壳（托盘、行宠、网络偏好等） | 下 [Releases](https://github.com/hisonWarren/deepseekharness-alter/releases) 安装包 |
+| **已有官方 / 自建 DeepSeek Harness，只要 Cursor 排队 + UX 抛光** | 只装插件 `dsh-ux-polish`（见下方） |
+
+---
+
+## 已有 DeepSeek Harness：只装插件
+
+插件路径：仓库内 [`plugins-local/dsh-ux-polish`](https://github.com/hisonWarren/deepseekharness-alter/tree/main/plugins-local/dsh-ux-polish)
+
+### 方法 A（推荐）：`dsh plugin add`
+
+在已能跑 `dsh web` 的机器上：
+
+```bash
+# 装到 web profile（常见）
+dsh plugin --profile web add "github:hisonWarren/deepseekharness-alter#main:plugins-local/dsh-ux-polish"
+
+# 若 peer 依赖冲突，可先 clone 再本地装：
+git clone --depth 1 https://github.com/hisonWarren/deepseekharness-alter.git
+dsh plugin --profile web add "file:./deepseekharness-alter/plugins-local/dsh-ux-polish"
+```
+
+然后确认 profile 的 `bundles` 里包含 `dsh-ux-polish`（`dsh plugin add` 通常会自动写入）。  
+重启 `dsh web`（或刷新页面），在设置 → Plugins 里应能看到 `dsh-ux-polish`。
+
+### 方法 B：手动拷到 profile（npm `file:` 装过旧版时尤其有用）
+
+`npm` 的 `file:` 依赖往往是**一次性拷贝**，改源码不会自动更新。可强制覆盖：
+
+```bash
+# Windows (PowerShell) — 把插件拷进已部署的 web profile
+$src = "D:\path\to\deepseekharness-alter\plugins-local\dsh-ux-polish"
+$dst = "$env:USERPROFILE\.dsh\profiles\web\node_modules\dsh-ux-polish"
+Copy-Item -Recurse -Force $src $dst
+```
+
+```bash
+# macOS / Linux
+SRC=./deepseekharness-alter/plugins-local/dsh-ux-polish
+DST="$HOME/.dsh/profiles/web/node_modules/dsh-ux-polish"
+rm -rf "$DST" && cp -R "$SRC" "$DST"
+```
+
+并在 `~/.dsh/profiles/web/package.json` 中保证：
+
+```json
+{
+  "dependencies": {
+    "dsh-ux-polish": "file:../path-or-keep-existing"
+  },
+  "dsh": {
+    "profile": {
+      "bundles": [
+        "...",
+        "dsh-ux-polish"
+      ]
+    }
+  }
+}
+```
+
+然后**重启** `dsh web`，浏览器硬刷新（Ctrl+Shift+R）。
+
+### 升级后仍看不到排队箭头？
+
+1. 看 `~/.dsh/profiles/web/node_modules/dsh-ux-polish/package.json` 的 `version` 是否 ≥ `0.3.0`
+2. 若仍是旧版，用方法 B 强制覆盖
+3. 运行中先**再输入一段文字**：空草稿时仍是「停止」；有草稿才会变成「加入排队」
+
+---
+
+## 下载安装包（完整 Alter 桌面壳）
 
 从 [Releases](https://github.com/hisonWarren/deepseekharness-alter/releases) 下载对应平台安装包：
 
@@ -33,8 +110,6 @@
 
 ## Cursor 式排队（dsh-ux-polish）
 
-内置本地插件 `plugins-local/dsh-ux-polish`：
-
 | 状态 | 主控件 |
 |------|--------|
 | 空闲 | 发送 |
@@ -48,7 +123,8 @@
 
 ## 说明
 
-- 本仓库是桌面壳与本地插件的增强版；更多社区插件仍可通过官方 dsh 配置安装。
+- 本仓库包含：**Electron 桌面壳** + **可单独安装的 `dsh-ux-polish` 插件**。
+- 已有 DSH 部署时，不必换安装包，按上文「只装插件」即可。
 - 安装包体积较大属预期（内含 dsh 运行时）。
 - macOS / Windows 安装包默认未做代码签名。
 
