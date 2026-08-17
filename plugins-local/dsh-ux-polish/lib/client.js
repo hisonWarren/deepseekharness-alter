@@ -97,7 +97,7 @@ window.__ModuleLoader__.load({
 			"[data-dsh-auto-review-section]>[data-dsh-auto-review-title]{font-size:12px!important;font-weight:600!important;margin:0 0 6px!important;padding:0!important;border:0!important}",
 			"[data-dsh-auto-review-approve]{border-radius:8px!important;min-height:24px!important;padding:2px 8px!important;border:1px solid var(--dsw-alias-border-l2)!important}",
 			"[data-dsh-auto-review-circuit]{margin-top:8px!important;padding:8px 10px!important;border-radius:8px!important;background:rgba(220,38,38,.08)!important}",
-			'body:has(.dsdr-overlay-docked) *:has(>[aria-label="展开侧边栏"]),body:has(.dsdr-overlay-docked) *:has(>[aria-label="收起侧边栏"]){visibility:hidden!important;pointer-events:none!important}',
+			'body:has(.dsdr-overlay-docked) [class$="_toggleCluster"]{visibility:hidden!important;pointer-events:none!important}',
 			/* Docked 变动: leave room for better-sidebar; restore soft left chrome */
 			'html{--dsh-ux-sidebar-w:0px}',
 			'.dsdr-overlay{z-index:300!important}',
@@ -1211,9 +1211,45 @@ window.__ModuleLoader__.load({
 			}, "dsh-ux-polish: paste/drop → .dsh-inbox");
 
 			// Docked 变动 vs better-sidebar: measure open panel width → CSS var.
+			// The sidebar's CSS-module classes are build-hashed (W-zNGW_…,
+			// nArs4W_…, …) and change on every rebuild — never hardcode one
+			// hash. Derive the prefix from the toggle cluster's stable
+			// "_toggleCluster" suffix, and fall back to a geometry scan.
 			ctx.effect(() => {
 				const root = document.documentElement;
 				let raf = 0;
+				const findSidebarPanel = () => {
+					const cluster = document.querySelector('[class$="_toggleCluster"]');
+					if (cluster) {
+						const cls = String(cluster.className)
+							.split(/\s+/)
+							.find((c) => c.endsWith("_toggleCluster"));
+						if (cls) {
+							const token = cls.slice(0, -"_toggleCluster".length) + "panel";
+							for (const el of document.querySelectorAll('[class*="_panel"]')) {
+								const tokens = String(el.className).split(/\s+/);
+								if (!tokens.includes(token)) continue;
+								if (tokens.includes(token + "Hidden")) continue;
+								const cs = getComputedStyle(el);
+								if (cs.visibility === "hidden" || cs.display === "none") continue;
+								return el;
+							}
+						}
+					}
+					// Fallback: a visible fixed panel flush to the right viewport
+					// edge, skipping the docked review panel and full-width drawers.
+					for (const el of document.querySelectorAll('[class*="_panel"]')) {
+						if (el.closest(".dsdr-overlay")) continue;
+						const cs = getComputedStyle(el);
+						if (cs.position !== "fixed" || cs.visibility === "hidden" || cs.display === "none") continue;
+						const r = el.getBoundingClientRect();
+						if (r.width < 40 || r.width > window.innerWidth * 0.6) continue;
+						if (r.top > 4 || r.bottom < window.innerHeight - 4) continue;
+						if (r.right < window.innerWidth - 12 || r.left >= window.innerWidth - 40) continue;
+						return el;
+					}
+					return null;
+				};
 				const measure = () => {
 					raf = 0;
 					const docked = document.querySelector(".dsdr-overlay-docked");
@@ -1221,7 +1257,7 @@ window.__ModuleLoader__.load({
 						root.style.setProperty("--dsh-ux-sidebar-w", "0px");
 						return;
 					}
-					const panel = document.querySelector(".W-zNGW_panel:not(.W-zNGW_panelHidden)");
+					const panel = findSidebarPanel();
 					let w = 0;
 					if (panel) {
 						const rect = panel.getBoundingClientRect();
