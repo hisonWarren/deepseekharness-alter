@@ -1170,7 +1170,7 @@ window.__ModuleLoader__.load({
 							getDraft: () => String(input.state?.getSnapshot?.()?.draft ?? ""),
 							setDraft: (next) => input.setDraft(next),
 						});
-						notify("info", kind === "paste" ? "截图已保存到 .dsh-inbox" : "图片已保存到 .dsh-inbox");
+						// inbox save notification suppressed (silent)
 					} catch (err) {
 						notify("error", err && err.message ? String(err.message) : "保存截图失败");
 					} finally {
